@@ -1,0 +1,15 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="Test:jar">
+    <output-path>$PROJECT_DIR$/out/artifacts/Test_jar</output-path>
+    <root id="archive" name="Test.jar">
+      <element id="directory" name="META-INF">
+        <element id="file-copy" path="$PROJECT_DIR$/META-INF/MANIFEST.MF" />
+      </element>
+      <element id="module-output" name="Test" />
+      <element id="library" level="project" name="Maven: com.godpalace.jprotector:JProtector:1.0" />
+      <element id="library" level="project" name="Maven: net.java.dev.jna:jna-platform:5.15.0" />
+      <element id="extracted-dir" path="$MAVEN_REPOSITORY$/com/github/kwhat/jnativehook/2.2.2/jnativehook-2.2.2.jar" path-in-jar="/" />
+      <element id="library" level="project" name="Maven: net.java.dev.jna:jna:5.15.0" />
+    </root>
+  </artifact>
+</component>

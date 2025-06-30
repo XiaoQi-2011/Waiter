@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.godpalace.test</groupId>
-    <artifactId>Test</artifactId>
+    <artifactId>Waiter</artifactId>
     <version>1.0</version>
 
     <dependencies>

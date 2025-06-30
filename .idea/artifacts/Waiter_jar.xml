@@ -1,0 +1,11 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="Waiter:jar">
+    <output-path>$PROJECT_DIR$/out/artifacts/Waiter_jar</output-path>
+    <root id="archive" name="Waiter.jar">
+      <element id="module-output" name="Waiter" />
+      <element id="extracted-dir" path="$MAVEN_REPOSITORY$/com/github/kwhat/jnativehook/2.2.2/jnativehook-2.2.2.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$MAVEN_REPOSITORY$/net/java/dev/jna/jna/5.15.0/jna-5.15.0.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$MAVEN_REPOSITORY$/net/java/dev/jna/jna-platform/5.15.0/jna-platform-5.15.0.jar" path-in-jar="/" />
+    </root>
+  </artifact>
+</component>
