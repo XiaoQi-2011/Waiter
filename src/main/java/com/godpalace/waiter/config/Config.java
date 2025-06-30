@@ -1,6 +1,6 @@
 package com.godpalace.waiter.config;
 
-import com.godpalace.waiter.Command;
+import com.godpalace.waiter.execute.Command;
 
 public class Config {
     public String name;

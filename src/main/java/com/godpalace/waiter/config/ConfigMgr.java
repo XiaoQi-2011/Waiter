@@ -1,8 +1,6 @@
 package com.godpalace.waiter.config;
 
-import com.godpalace.waiter.Compiler;
-import com.godpalace.waiter.Main;
-import com.godpalace.waiter.TestPower;
+import com.godpalace.waiter.execute.Compiler;
 
 import java.io.*;
 import java.util.HashMap;
@@ -39,14 +37,11 @@ public class ConfigMgr {
     }
 
     public void save() throws IOException {
-        boolean isTest = TestPower.isTest;
         File file = new File(TAG);
         if (!file.exists()) {
             file.createNewFile();
         }
         FileOutputStream fos = new FileOutputStream(file);
-
-        fos.write(("isTest " + (isTest? "true" : "false") + "\n").getBytes());
         fos.write(("All " + Allkey + "\n").getBytes());
         for (Config config : configMap.values()) {
             String text = "Config " + config.name + " "
@@ -60,7 +55,6 @@ public class ConfigMgr {
     }
 
     public void load(Compiler compiler) throws Exception {
-        boolean isTest = TestPower.isTest;
         File file = new File(TAG);
         if (!file.exists()) {
             return;
@@ -71,10 +65,6 @@ public class ConfigMgr {
         String line;
 
         while ((line = reader.readLine())!= null) {
-
-            if (line.startsWith("isTest ")) {
-                isTest = line.split(" ")[1].equals("true");
-            }
             if (line.startsWith("All ")) {
                 Allkey = line.split(" ")[1];
             }
@@ -90,10 +80,6 @@ public class ConfigMgr {
             }
         }
         fis.close();
-        Main.Test.set(isTest);
-        if (isTest) {
-            TestPower.start();
-        }
         for (Config config : configMap.values()){
             compiler.createThread(config.name);
         }
