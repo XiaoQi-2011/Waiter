@@ -2,6 +2,7 @@ package com.godpalace.waiter.GUI;
 
 import com.godpalace.waiter.Main;
 import com.godpalace.waiter.config.Config;
+import com.godpalace.waiter.config.ConfigMgr;
 
 import javax.swing.*;
 import java.io.File;
@@ -84,20 +85,62 @@ public class UIFrame extends JFrame {
         });
         menu.add(item2);
 
+        JMenuItem item3 = new JMenuItem("运行/停止配置");
+        item3.addActionListener(e -> {
+            String name = ConfigPanel.configList.getSelectedValue();
+            if (name == null || name.isEmpty()) {
+                return;
+            }
+            if (Main.configMgr.getConfig(name).isRunning) {
+                Main.compiler.stop(name);
+            } else {
+                Main.compiler.execute(name);
+            }
+        });
+        menu.add(item3);
+
+        menu.addSeparator();
+
         JMenuItem item = new JMenuItem("退出");
         item.addActionListener(e -> System.exit(0));
         menu.add(item);
 
         menuBar.add(menu);//
 
-        JMenu menu1 = new JMenu("设置");//
+        JMenu menu1 = new JMenu("编辑");//
+
+        JMenuItem item4 = new JMenuItem("保存并编译配置");
+        item4.addActionListener(e -> {
+            try {
+                filePanel.save();
+            } catch (Exception ex) {
+                throw new RuntimeException(ex);
+            }
+        });
+        menu1.add(item4);
+
         menuBar.add(menu1);//
 
-        JMenu menu2 = new JMenu("编辑");//
+        JMenu menu2 = new JMenu("设置");//
+
+        JMenuItem item5 = new JMenuItem("修改全局热键");
+        item5.addActionListener(e -> {
+            String key = JOptionPane.showInputDialog(Main.frame, "请输入热键：", ConfigMgr.Allkey);
+            if (key == null || key.isEmpty()) {
+                ConfigMgr.Allkey = "None";
+            } else {
+                ConfigMgr.Allkey = key;
+            }
+            try {
+                Main.configMgr.save();
+            } catch (IOException ex) {
+                throw new RuntimeException(ex);
+            }
+        });
+        menu2.add(item5);
+
         menuBar.add(menu2);//
 
         setJMenuBar(menuBar);
-
-
     }
 }

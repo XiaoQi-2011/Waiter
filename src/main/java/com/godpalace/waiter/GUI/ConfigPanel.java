@@ -1,6 +1,5 @@
 package com.godpalace.waiter.GUI;
 
-import com.godpalace.waiter.Main;
 import com.godpalace.waiter.config.Config;
 import com.godpalace.waiter.config.ConfigMgr;
 
@@ -28,7 +27,7 @@ public class ConfigPanel extends JSplitPane {
             }
             settingsPanel.setEnables(true);
             String configName = configList.getSelectedValue();
-            UIFrame.filePanel.setFile(new File(ConfigMgr.configMap.get(configName).path));
+            UIFrame.filePanel.setName(configName);
             settingsPanel.setConfigName(configName);
             settingsPanel.loadConfig();
 

@@ -24,6 +24,6 @@ public class Config {
         this.path = path;
         this.runDelay = 5;
         this.isWhile = true;
-        this.keybind = "none";
+        this.keybind = "None";
     }
 }

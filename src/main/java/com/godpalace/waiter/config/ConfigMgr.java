@@ -48,7 +48,7 @@ public class ConfigMgr {
                     + config.path + " "
                     + config.runDelay + " "
                     + (config.isWhile? "true" : "false") + " "
-                    + (config.keybind == null ? "none" : config.keybind);
+                    + (config.keybind == null ? "None" : config.keybind);
             fos.write((text +"\n").getBytes());
         }
         fos.close();
@@ -74,7 +74,7 @@ public class ConfigMgr {
                 String path = parts[2];
                 int runDelay = Integer.parseInt(parts[3]);
                 boolean isWhile = parts[4].equals("true");
-                String keybind = (parts[5] == null ? "none" : parts[5]);
+                String keybind = (parts[5] == null ? "None" : parts[5]);
                 Config config = new Config(name, path, runDelay, isWhile, keybind);
                 addConfig(config);
             }
