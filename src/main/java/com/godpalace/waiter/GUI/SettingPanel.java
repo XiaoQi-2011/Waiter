@@ -7,13 +7,15 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import java.io.IOException;
 
 public class SettingPanel extends JPanel {
     private String name;
     public JLabel titleLabel = new JLabel("设置 []");
-    public JTextField delayTextField = new JTextField("10");
-    public JTextField keyBindTextField = new JTextField(" ");
+    public JSpinner delayTextField = new JSpinner(new SpinnerNumberModel(5, 1, 1000, 1));
+    public JTextField keyBindTextField = new JTextField("none");
     public JCheckBox isWhileChecked = new JCheckBox("", true);
 
     public JPanel centerPanel = new JPanel();
@@ -71,21 +73,21 @@ public class SettingPanel extends JPanel {
     public void loadConfig() {
         Config config = Main.configMgr.getConfig(name);
         titleLabel.setText("设置 [" + config.name + "]");
-        delayTextField.setText(String.valueOf(config.runDelay));
         isWhileChecked.setSelected(config.isWhile);
         keyBindTextField.setText(config.keybind);
+        delayTextField.setValue(config.runDelay);
     }
 
     public void saveConfig() throws IOException {
         Config config = Main.configMgr.getConfig(name);
-        config.runDelay = Integer.parseInt(delayTextField.getText());
+        config.runDelay = (int) delayTextField.getValue();
         config.isWhile = isWhileChecked.isSelected();
         config.keybind = keyBindTextField.getText();
         Main.configMgr.save();
     }
 
     private void addAutoSave() {
-        delayTextField.addActionListener(e -> {
+        delayTextField.addChangeListener(e -> {
             try {
                 saveConfig();
             } catch (IOException ex) {
@@ -102,15 +104,11 @@ public class SettingPanel extends JPanel {
             }
         });
 
-        keyBindTextField.addActionListener(e -> {
-            try {
-                saveConfig();
-            } catch (IOException ex) {
-                throw new RuntimeException(ex);
-            }
-        });
-        keyBindTextField.addFocusListener(new FocusAdapter() {
-            public void focusLost(FocusEvent e) {
+        keyBindTextField.addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyReleased(KeyEvent e) {
+                String key = KeyEvent.getKeyText(e.getKeyCode());
+                keyBindTextField.setText(key);
                 try {
                     saveConfig();
                 } catch (IOException ex) {
@@ -126,5 +124,11 @@ public class SettingPanel extends JPanel {
                 throw new RuntimeException(ex);
             }
         });
+    }
+
+    public void setEnables(boolean enabled) {
+        delayTextField.setEnabled(enabled);
+        keyBindTextField.setEnabled(enabled);
+        isWhileChecked.setEnabled(enabled);
     }
 }

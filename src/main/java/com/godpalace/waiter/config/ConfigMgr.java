@@ -16,7 +16,7 @@ public class ConfigMgr {
     public ConfigMgr() {}
 
     public void addConfig(Config config) throws Exception {
-        config.command = Compiler.compile(config.name, config.path);
+        config.command = Compiler.compile(config.path);
         configMap.put(config.name, config);
     }
 
@@ -48,7 +48,7 @@ public class ConfigMgr {
                     + config.path + " "
                     + config.runDelay + " "
                     + (config.isWhile? "true" : "false") + " "
-                    + (config.keybind == null? "none" : config.keybind);
+                    + (config.keybind == null ? "none" : config.keybind);
             fos.write((text +"\n").getBytes());
         }
         fos.close();
@@ -74,7 +74,7 @@ public class ConfigMgr {
                 String path = parts[2];
                 int runDelay = Integer.parseInt(parts[3]);
                 boolean isWhile = parts[4].equals("true");
-                String keybind = parts[5].equals("none")? null : parts[5];
+                String keybind = (parts[5] == null ? "none" : parts[5]);
                 Config config = new Config(name, path, runDelay, isWhile, keybind);
                 addConfig(config);
             }

@@ -6,6 +6,7 @@ import com.godpalace.waiter.config.ConfigMgr;
 
 import javax.swing.*;
 import java.awt.*;
+import java.io.File;
 
 public class ConfigPanel extends JSplitPane {
     public static SettingPanel settingsPanel = new SettingPanel();
@@ -25,8 +26,12 @@ public class ConfigPanel extends JSplitPane {
             if (configList.getSelectedValue() == null) {
                 return;
             }
-            settingsPanel.setConfigName(configList.getSelectedValue());
+            settingsPanel.setEnables(true);
+            String configName = configList.getSelectedValue();
+            UIFrame.filePanel.setFile(new File(ConfigMgr.configMap.get(configName).path));
+            settingsPanel.setConfigName(configName);
             settingsPanel.loadConfig();
+
         });
         configList.setFixedCellHeight(35);
         configList.setFont(new Font("微软雅黑", Font.PLAIN, 14));
@@ -46,6 +51,8 @@ public class ConfigPanel extends JSplitPane {
         }
         if (!listModel.isEmpty()) {
             configList.setSelectedIndex(0);
+        } else {
+            settingsPanel.setEnables(false);
         }
     }
 }

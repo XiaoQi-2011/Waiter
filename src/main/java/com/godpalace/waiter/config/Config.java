@@ -22,8 +22,8 @@ public class Config {
     public Config(String name, String path){
         this.name = name;
         this.path = path;
-        this.runDelay = 10;
+        this.runDelay = 5;
         this.isWhile = true;
-        this.keybind = null;
+        this.keybind = "none";
     }
 }

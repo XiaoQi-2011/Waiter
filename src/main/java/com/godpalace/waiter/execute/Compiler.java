@@ -140,7 +140,7 @@ public class Compiler {
         return result.toString().trim();
     }
 
-    public static Command compile(String name, String path) throws Exception {
+    public static Command compile(String path) throws Exception {
         Command c = new Command();
 
         FileInputStream fileInputStream;
