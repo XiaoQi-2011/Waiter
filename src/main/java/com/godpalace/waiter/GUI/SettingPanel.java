@@ -132,3 +132,4 @@ public class SettingPanel extends JPanel {
         isWhileChecked.setEnabled(enabled);
     }
 }
+//

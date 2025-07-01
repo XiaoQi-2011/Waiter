@@ -146,5 +146,5 @@ public class FilePanel extends JPanel {
         isSaved = true;
         Title.setText(file.getName());
     }
-
 }
+//

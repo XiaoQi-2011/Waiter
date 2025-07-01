@@ -38,6 +38,7 @@ public final class MouseLocGetter {
 
         frame.setVisible(true);
 
+
         return loc;
     }
 }

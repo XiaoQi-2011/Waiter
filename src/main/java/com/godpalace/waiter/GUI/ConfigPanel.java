@@ -55,3 +55,4 @@ public class ConfigPanel extends JSplitPane {
         }
     }
 }
+//
