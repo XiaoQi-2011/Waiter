@@ -139,3 +139,4 @@ public class FilePanel extends JPanel {
         Title.setText(file.getName());
     }
 }
+//
