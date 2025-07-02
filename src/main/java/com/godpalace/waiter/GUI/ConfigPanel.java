@@ -13,8 +13,8 @@ public class ConfigPanel extends JSplitPane {
     public static DefaultListModel<String> listModel = new DefaultListModel<>();
 
     public ConfigPanel() {
-        setLeftComponent(settingsPanel);
-        setRightComponent(configList);
+        setLeftComponent(new JScrollPane(settingsPanel));
+        setRightComponent(new JScrollPane(configList));
         setOrientation(JSplitPane.HORIZONTAL_SPLIT);
         setDividerLocation(200);
         setContinuousLayout(true);
@@ -55,4 +55,3 @@ public class ConfigPanel extends JSplitPane {
         }
     }
 }
-//

@@ -25,7 +25,7 @@ public class Compiler {
 
         @Override
         public void run() {
-            Robot robot = null;
+            Robot robot;
             try {
                 robot = new Robot();
                 robot.setAutoDelay(configMgr.getConfig(name).runDelay);
@@ -170,9 +170,14 @@ public class Compiler {
         return c;
     }
 
-    public void createThread(String name) throws Exception {
+    public void createThread(String name) {
         ThreadClass thread = new ThreadClass(name);
         threads.put(name, new Thread(thread));
+    }
+
+    public void removeThread(String name) {
+        threads.get(name).interrupt();
+        threads.remove(name);
     }
 
     public void executeAll() {

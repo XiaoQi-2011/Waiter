@@ -2,6 +2,7 @@ package com.godpalace.waiter.GUI;
 
 import com.godpalace.waiter.Main;
 import com.godpalace.waiter.Util.MouseLocGetter;
+import com.godpalace.waiter.config.Config;
 import com.godpalace.waiter.config.ConfigMgr;
 import com.godpalace.waiter.execute.Command;
 import com.godpalace.waiter.execute.Compiler;
@@ -28,18 +29,13 @@ public class FilePanel extends JPanel {
             "TypeKey: [输入键盘键]",
             "Sleep: [等待指定时间]",
     };
-    private static final String[] MOUSE_VALUES = {
-            "1 [左键]",
-            "2 [中键]",
-            "3 [右键]",
-    };
 
-    public File file = new File("untitled.txt");
+    public File file;
     public String name;
     public JTextArea MainPanel = new JTextArea();
     public JLabel Title = new JLabel();
     public JPanel toolPanel = new JPanel();
-    private boolean isSaved = true;
+    private String oldContent = "";
     public FilePanel() {
         setBackground(new Color(246, 246, 246));
         setLayout(new BorderLayout());
@@ -52,7 +48,7 @@ public class FilePanel extends JPanel {
         Title.setFont(new Font("Arial", Font.PLAIN, 14));
         Title.setForeground(Color.DARK_GRAY);
         Title.setHorizontalAlignment(SwingConstants.LEFT);
-        Title.setText("*untitled.txt");
+        Title.setText("");
 
         JPopupMenu popupMenu = new JPopupMenu();
         for (String value : VALUES) {
@@ -64,20 +60,15 @@ public class FilePanel extends JPanel {
             popupMenu.add(menuItem);
         }
         popupMenu.addSeparator();
-        for (String value : MOUSE_VALUES) {
-            JMenuItem menuItem = new JMenuItem(value);
-            menuItem.addActionListener(e -> {
-                String text = MainPanel.getText();
-                MainPanel.setText(text + value.substring(0, value.indexOf(' ')) + "\n");
-            });
-            popupMenu.add(menuItem);
-        }
+
         MainPanel.setComponentPopupMenu(popupMenu);
         MainPanel.addKeyListener(new KeyAdapter() {
             @Override
             public void keyPressed(KeyEvent e) {
-                isSaved = false;
-                Title.setText("*" + file.getName());
+                if (!MainPanel.getText().equals(oldContent)) {
+                    Title.setText("*" + file.getName());
+                    oldContent = MainPanel.getText();
+                }
             }
         });
 
@@ -97,6 +88,8 @@ public class FilePanel extends JPanel {
                 int keyCode = e.getKeyCode();
                 if (isGetkey.get()) {
                     MainPanel.setText(MainPanel.getText() + keyCode + "\n");
+                    isGetkey.set(!isGetkey.get());
+                    getkeyButton.setText(isGetkey.get() ? "..." : "K");
                 }
             }
         });
@@ -108,9 +101,7 @@ public class FilePanel extends JPanel {
         getLocButton.setBackground(Color.WHITE);
         getLocButton.setPreferredSize(new Dimension(20, 20));
         getLocButton.addActionListener(e -> {
-            MouseLocGetter.MouseLoc loc = MouseLocGetter.getMouseLoc();
-            String locStr = loc.x + "," + loc.y;
-            MainPanel.setText(MainPanel.getText() + locStr + "\n");
+            MouseLocGetter.outputMouseLoc(MainPanel);
         });
         toolPanel.add(getLocButton);
 
@@ -136,15 +127,15 @@ public class FilePanel extends JPanel {
     }
 
     public void save() throws Exception {
-        if (file == null || name == null) {
+        if (file == null || name.isEmpty()) {
             return;
         }
         String content = MainPanel.getText();
+        oldContent = content;
         String path = file.getAbsolutePath();
         Files.write(file.toPath(), content.getBytes());
         Main.configMgr.getConfig(name).command = Compiler.compile(path);
-        isSaved = true;
+        Main.configMgr.save();
         Title.setText(file.getName());
     }
 }
-//

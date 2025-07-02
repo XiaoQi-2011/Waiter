@@ -2,6 +2,7 @@ package com.godpalace.waiter.GUI;
 
 import com.godpalace.waiter.Main;
 import com.godpalace.waiter.config.Config;
+import com.godpalace.waiter.execute.Compiler;
 
 import javax.swing.*;
 import java.awt.*;
@@ -9,14 +10,17 @@ import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.io.File;
 import java.io.IOException;
 
 public class SettingPanel extends JPanel {
     private String name;
+
     public JLabel titleLabel = new JLabel("设置 []");
     public JSpinner delayTextField = new JSpinner(new SpinnerNumberModel(5, 1, 1000, 1));
     public JTextField keyBindTextField = new JTextField("none");
     public JCheckBox isWhileChecked = new JCheckBox("", true);
+    public JLabel fileLabel = new JLabel("");
 
     public JPanel centerPanel = new JPanel();
     public SettingPanel() {
@@ -27,7 +31,7 @@ public class SettingPanel extends JPanel {
 
         centerPanel.setLayout(new BoxLayout(centerPanel, BoxLayout.Y_AXIS));
         centerPanel.setBackground(Color.WHITE);
-        centerPanel.setSize(150, 125);
+        centerPanel.setSize(150, 160);
 
         JPanel delayPanel = new JPanel();
         delayPanel.setBackground(Color.WHITE);
@@ -54,6 +58,39 @@ public class SettingPanel extends JPanel {
         keyBindPanel.add(keyBindTextField, BorderLayout.CENTER);
         centerPanel.add(keyBindPanel);
 
+        JPanel filePanel = new JPanel();
+        filePanel.setBackground(Color.WHITE);
+        filePanel.setLayout(new BorderLayout());
+        filePanel.add(new JLabel("文件路径:"), BorderLayout.WEST);
+        filePanel.add(fileLabel, BorderLayout.CENTER);
+
+        JButton fileButton = new JButton("修改");
+        fileButton.setBackground(Color.WHITE);
+        fileButton.addActionListener(e -> {
+            int result = Main.fileChooser.showOpenDialog(null);
+            if (result == JFileChooser.APPROVE_OPTION) {
+                String path;
+                File file = Main.fileChooser.getSelectedFile();
+                if (!file.getName().toLowerCase().endsWith(Main.FILE_TYPE)) {
+                    JOptionPane.showMessageDialog(Main.frame, "文件格式不正确！", "错误", JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+                path = file.getAbsolutePath();
+                fileLabel.setText(path);
+                Config config = Main.configMgr.getConfig(name);
+                config.path = path;
+                try {
+                    config.command = Compiler.compile(config.path);
+                    Main.configMgr.save();
+                } catch (Exception ex) {
+                    throw new RuntimeException(ex);
+                }
+            }
+        });
+        filePanel.add(fileButton, BorderLayout.EAST);
+        centerPanel.add(filePanel);
+
+
         JPanel panel = new JPanel();
         panel.setLayout(null);
         panel.add(centerPanel);
@@ -76,6 +113,7 @@ public class SettingPanel extends JPanel {
         isWhileChecked.setSelected(config.isWhile);
         keyBindTextField.setText(config.keybind);
         delayTextField.setValue(config.runDelay);
+        fileLabel.setText(config.path);
     }
 
     public void saveConfig() throws IOException {
@@ -108,7 +146,7 @@ public class SettingPanel extends JPanel {
             @Override
             public void keyReleased(KeyEvent e) {
                 String key = KeyEvent.getKeyText(e.getKeyCode());
-                keyBindTextField.setText(key);
+                keyBindTextField.setText(key.equals("Esc") ? "None" : key);
                 try {
                     saveConfig();
                 } catch (IOException ex) {
@@ -132,4 +170,3 @@ public class SettingPanel extends JPanel {
         isWhileChecked.setEnabled(enabled);
     }
 }
-//

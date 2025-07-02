@@ -5,6 +5,7 @@ import com.godpalace.waiter.config.Config;
 import com.godpalace.waiter.config.ConfigMgr;
 
 import javax.swing.*;
+import javax.swing.filechooser.FileFilter;
 import java.io.File;
 import java.io.IOException;
 
@@ -35,14 +36,12 @@ public class UIFrame extends JFrame {
         JMenuItem item1 = new JMenuItem("添加配置");
         item1.addActionListener(e -> {
             String path = "";
-            JFileChooser fileChooser = new JFileChooser();
-            fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
-            int result = fileChooser.showOpenDialog(Main.frame);
+            int result = Main.fileChooser.showOpenDialog(Main.frame);
             File file = null;
             if (result == JFileChooser.APPROVE_OPTION) {
-                file = fileChooser.getSelectedFile();
-                if (file == null) {
-                    JOptionPane.showMessageDialog(Main.frame, "文件不能为空！");
+                file = Main.fileChooser.getSelectedFile();
+                if (!file.getName().toLowerCase().endsWith(Main.FILE_TYPE)) {
+                    JOptionPane.showMessageDialog(Main.frame, "文件格式不正确！", "错误", JOptionPane.ERROR_MESSAGE);
                     return;
                 }
                 path = file.getAbsolutePath();
@@ -60,7 +59,7 @@ public class UIFrame extends JFrame {
             } catch (Exception ex) {
                 throw new RuntimeException(ex);
             }
-            JOptionPane.showMessageDialog(Main.frame, "添加成功！");
+            //JOptionPane.showMessageDialog(Main.frame, "添加成功！");
         });
         menu.add(item1);
 
@@ -74,8 +73,9 @@ public class UIFrame extends JFrame {
             if (result == JOptionPane.NO_OPTION) {
                 return;
             }
-            Main.configMgr.removeConfig(name);
             try {
+                Main.configMgr.removeConfig(name);
+                Main.compiler.removeThread(name);
                 Main.configMgr.save();
             } catch (IOException ex) {
                 throw new RuntimeException(ex);
@@ -85,8 +85,31 @@ public class UIFrame extends JFrame {
         });
         menu.add(item2);
 
-        JMenuItem item3 = new JMenuItem("运行/停止配置");
+        JMenuItem item3 = new JMenuItem("新建配置");
         item3.addActionListener(e -> {
+            String name = JOptionPane.showInputDialog(Main.frame, "请输入配置名称：");
+            if (name == null || name.isEmpty()) {
+                return;
+            }
+            try {
+                String path = name + "." + Main.FILE_TYPE;
+                File file = new File(path);
+                if (!file.exists()) {
+                    file.createNewFile();
+                }
+                Main.configMgr.addConfig(new Config(name, path));
+                Main.compiler.createThread(name);
+                Main.configMgr.save();
+                configPanel.updateConfigPanel();
+            } catch (Exception ex) {
+                throw new RuntimeException(ex);
+            }
+            //JOptionPane.showMessageDialog(Main.frame, "新建成功！");
+        });
+        menu.add(item3);
+
+        JMenuItem item4 = new JMenuItem("运行/停止配置");
+        item4.addActionListener(e -> {
             String name = ConfigPanel.configList.getSelectedValue();
             if (name == null || name.isEmpty()) {
                 return;
@@ -97,7 +120,7 @@ public class UIFrame extends JFrame {
                 Main.compiler.execute(name);
             }
         });
-        menu.add(item3);
+        menu.add(item4);
 
         menu.addSeparator();
 
@@ -109,22 +132,22 @@ public class UIFrame extends JFrame {
 
         JMenu menu1 = new JMenu("编辑");//
 
-        JMenuItem item4 = new JMenuItem("保存并编译配置");
-        item4.addActionListener(e -> {
+        JMenuItem item5 = new JMenuItem("保存配置文件");
+        item5.addActionListener(e -> {
             try {
                 filePanel.save();
             } catch (Exception ex) {
                 throw new RuntimeException(ex);
             }
         });
-        menu1.add(item4);
+        menu1.add(item5);
 
         menuBar.add(menu1);//
 
         JMenu menu2 = new JMenu("设置");//
 
-        JMenuItem item5 = new JMenuItem("修改全局热键");
-        item5.addActionListener(e -> {
+        JMenuItem item6 = new JMenuItem("修改全局热键");
+        item6.addActionListener(e -> {
             String key = JOptionPane.showInputDialog(Main.frame, "请输入热键：", ConfigMgr.Allkey);
             if (key == null || key.isEmpty()) {
                 ConfigMgr.Allkey = "None";
@@ -137,11 +160,10 @@ public class UIFrame extends JFrame {
                 throw new RuntimeException(ex);
             }
         });
-        menu2.add(item5);
+        menu2.add(item6);
 
         menuBar.add(menu2);//
 
         setJMenuBar(menuBar);
     }
 }
-//
