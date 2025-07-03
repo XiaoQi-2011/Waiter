@@ -9,8 +9,7 @@ import com.godpalace.waiter.execute.Compiler;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
+import java.awt.event.*;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -26,7 +25,7 @@ public class FilePanel extends JPanel {
             "MoveMouse2: [移动鼠标相对位置]",
             "PressKey: [按下键盘键]",
             "ReleaseKey: [释放键盘键]",
-            "TypeKey: [输入键盘键]",
+            "ClickKey: [单击键盘键]",
             "Sleep: [等待指定时间]",
     };
 
@@ -54,12 +53,28 @@ public class FilePanel extends JPanel {
         for (String value : VALUES) {
             JMenuItem menuItem = new JMenuItem(value);
             menuItem.addActionListener(e -> {
-                String text = MainPanel.getText();
-                MainPanel.setText(text + value.substring(0, value.indexOf(':') + 1));
+                if (MainPanel.getSelectedText() == null) {
+                    String text = MainPanel.getText();
+                    String replace = value.substring(0, value.indexOf(':') + 1);
+                    MainPanel.setText(text + replace);
+                } else {
+                    String text = MainPanel.getText();
+                    String replace = value.substring(0, value.indexOf(':') + 1);
+                    MainPanel.replaceSelection(replace);
+                }
             });
             popupMenu.add(menuItem);
         }
         popupMenu.addSeparator();
+        JMenuItem getkeyItem = new JMenuItem("获取选中数字键值");
+        getkeyItem.addActionListener(e -> {
+            if (MainPanel.getSelectedText()!= null) {
+                String text = MainPanel.getSelectedText();
+                int keyCode = Integer.parseInt(text);
+                JOptionPane.showMessageDialog(Main.frame, "键值: " + KeyEvent.getKeyText(keyCode));
+            }
+        });
+        popupMenu.add(getkeyItem);
 
         MainPanel.setComponentPopupMenu(popupMenu);
         MainPanel.addKeyListener(new KeyAdapter() {
@@ -70,12 +85,26 @@ public class FilePanel extends JPanel {
                     oldContent = MainPanel.getText();
                 }
             }
+            @Override
+            public void keyReleased(KeyEvent e) {
+                if (!MainPanel.getText().equals(oldContent)) {
+                    Title.setText("*" + file.getName());
+                    oldContent = MainPanel.getText();
+                }
+            }
         });
 
-        JButton getkeyButton = new JButton("K");
+        JButton getkeyButton = new JButton("K") {
+            @Override
+            public JToolTip createToolTip() {
+                JToolTip toolTip = new JToolTip();
+                toolTip.setBackground(Color.WHITE);
+                return toolTip;
+            }
+        };
         getkeyButton.setMargin(new Insets(0, 0, 0, 0));
-        getkeyButton.setToolTipText("获取键值");
         getkeyButton.setBackground(Color.WHITE);
+        getkeyButton.setToolTipText("获取键盘按键");
         getkeyButton.setPreferredSize(new Dimension(20, 20));
         AtomicBoolean isGetkey = new AtomicBoolean(false);
         getkeyButton.addActionListener(e -> {
@@ -95,7 +124,14 @@ public class FilePanel extends JPanel {
         });
         toolPanel.add(getkeyButton);
 
-        JButton getLocButton = new JButton("L");
+        JButton getLocButton = new JButton("P") {
+            @Override
+            public JToolTip createToolTip() {
+                JToolTip toolTip = new JToolTip();
+                toolTip.setBackground(Color.WHITE);
+                return toolTip;
+            }
+        };
         getLocButton.setMargin(new Insets(0, 0, 0, 0));
         getLocButton.setToolTipText("获取鼠标位置");
         getLocButton.setBackground(Color.WHITE);

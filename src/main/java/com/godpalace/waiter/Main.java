@@ -11,9 +11,10 @@ import java.io.File;
 
 
 public class Main {
-    public static final String VERSION = "v4.3";
     public static final String FILE_TYPE = "wait";
+    public static final String VERSION = "v4.3";
 
+    public static final Helper helper = new Helper();
     public static final ConfigMgr configMgr = new ConfigMgr();
     public static final Compiler compiler = new Compiler();
     public static final Binder binder = new Binder();
@@ -52,4 +53,3 @@ public class Main {
         frame.setVisible(true);
     }
 }
-//

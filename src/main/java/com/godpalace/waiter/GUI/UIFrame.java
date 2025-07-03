@@ -5,7 +5,6 @@ import com.godpalace.waiter.config.Config;
 import com.godpalace.waiter.config.ConfigMgr;
 
 import javax.swing.*;
-import javax.swing.filechooser.FileFilter;
 import java.io.File;
 import java.io.IOException;
 
@@ -15,7 +14,7 @@ public class UIFrame extends JFrame {
     public static FilePanel filePanel;
     public static JTabbedPane tabbedPane = new JTabbedPane();
     public UIFrame() {
-        setTitle("Waiter v4.0");
+        setTitle("Waiter " + Main.VERSION);
         setSize(600, 400);
         setLocation(250, 250);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -164,7 +163,15 @@ public class UIFrame extends JFrame {
 
         menuBar.add(menu2);//
 
+        JMenu menu3 = new JMenu("帮助");//
+        JMenuItem item7 = new JMenuItem("关于");
+        item7.addActionListener(e -> {
+            Main.helper.setVisible(true);
+        });
+        menu3.add(item7);
+
+        menuBar.add(menu3);//
+
         setJMenuBar(menuBar);
     }
 }
-//

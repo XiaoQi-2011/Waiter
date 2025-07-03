@@ -38,7 +38,8 @@ public class ConfigPanel extends JSplitPane {
 
         new Thread(() -> {
             while (true) {
-                settingsPanel.centerPanel.setSize(settingsPanel.getWidth(), 125);
+                settingsPanel.centerPanel.setSize(settingsPanel.getWidth(),
+                        settingsPanel.height + settingsPanel.fileLabel.getPreferredSize().height);
             }
         }).start();
     }
@@ -55,4 +56,3 @@ public class ConfigPanel extends JSplitPane {
         }
     }
 }
-//

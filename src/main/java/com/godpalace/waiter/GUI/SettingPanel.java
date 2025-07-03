@@ -6,21 +6,19 @@ import com.godpalace.waiter.execute.Compiler;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.FocusAdapter;
-import java.awt.event.FocusEvent;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
+import java.awt.event.*;
 import java.io.File;
 import java.io.IOException;
 
 public class SettingPanel extends JPanel {
     private String name;
 
+    public int height = 140;
     public JLabel titleLabel = new JLabel("设置 []");
     public JSpinner delayTextField = new JSpinner(new SpinnerNumberModel(5, 1, 1000, 1));
     public JTextField keyBindTextField = new JTextField("none");
     public JCheckBox isWhileChecked = new JCheckBox("", true);
-    public JLabel fileLabel = new JLabel("");
+    public JTextArea fileLabel = new JTextArea("");
 
     public JPanel centerPanel = new JPanel();
     public SettingPanel() {
@@ -31,7 +29,7 @@ public class SettingPanel extends JPanel {
 
         centerPanel.setLayout(new BoxLayout(centerPanel, BoxLayout.Y_AXIS));
         centerPanel.setBackground(Color.WHITE);
-        centerPanel.setSize(150, 160);
+        centerPanel.setSize(150, height);
 
         JPanel delayPanel = new JPanel();
         delayPanel.setBackground(Color.WHITE);
@@ -61,10 +59,32 @@ public class SettingPanel extends JPanel {
         JPanel filePanel = new JPanel();
         filePanel.setBackground(Color.WHITE);
         filePanel.setLayout(new BorderLayout());
-        filePanel.add(new JLabel("文件路径:"), BorderLayout.WEST);
+        JPanel fileLabelPanel = new JPanel();
+        fileLabelPanel.setBackground(Color.WHITE);
+        fileLabelPanel.setLayout(new BorderLayout());
+        JPanel fileLabel0 = new JPanel();
+        fileLabel0.setLayout(new BoxLayout(fileLabel0, BoxLayout.Y_AXIS));
+        fileLabel0.setSize(this.getWidth(), 45);
+        fileLabel0.setBackground(Color.WHITE);
+        fileLabel0.add(Box.createRigidArea(new Dimension(0, 15)));
+        fileLabel0.add(new JLabel("文件路径:"));
+        fileLabelPanel.add(fileLabel0, BorderLayout.NORTH);
+        filePanel.add(fileLabelPanel, BorderLayout.WEST);
+
+        fileLabel.setEditable(false);
+        fileLabel.setLineWrap(true);
+        fileLabel.setWrapStyleWord(true);
+        fileLabel.setBackground(Color.WHITE);
+        fileLabel.setOpaque(false);
         filePanel.add(fileLabel, BorderLayout.CENTER);
 
+        JPanel fileButtonPanel = new JPanel();
+        fileButtonPanel.setBackground(Color.WHITE);
+        fileButtonPanel.setLayout(new FlowLayout(FlowLayout.CENTER));
+
         JButton fileButton = new JButton("修改");
+        fileButton.setPreferredSize(new Dimension(35, 30));
+        fileButton.setMargin(new Insets(0, 0, 0, 0));
         fileButton.setBackground(Color.WHITE);
         fileButton.addActionListener(e -> {
             int result = Main.fileChooser.showOpenDialog(null);
@@ -80,14 +100,16 @@ public class SettingPanel extends JPanel {
                 Config config = Main.configMgr.getConfig(name);
                 config.path = path;
                 try {
-                    config.command = Compiler.compile(config.path);
+                    UIFrame.filePanel.setName(config.name);
+                    UIFrame.filePanel.save();
                     Main.configMgr.save();
                 } catch (Exception ex) {
                     throw new RuntimeException(ex);
                 }
             }
         });
-        filePanel.add(fileButton, BorderLayout.EAST);
+        fileButtonPanel.add(fileButton);
+        filePanel.add(fileButtonPanel, BorderLayout.EAST);
         centerPanel.add(filePanel);
 
 
@@ -168,6 +190,6 @@ public class SettingPanel extends JPanel {
         delayTextField.setEnabled(enabled);
         keyBindTextField.setEnabled(enabled);
         isWhileChecked.setEnabled(enabled);
+        fileLabel.setEnabled(enabled);
     }
 }
-//

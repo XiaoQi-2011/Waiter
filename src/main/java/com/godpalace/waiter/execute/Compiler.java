@@ -94,7 +94,7 @@ public class Compiler {
                         robot.keyRelease(value);
                     }
 
-                    if (cmdStr.equals("TypeKey")) {
+                    if (cmdStr.equals("ClickKey")) {
                         int value = values.get(0);
                         robot.keyPress(value);
                         robot.keyRelease(value);
@@ -211,3 +211,4 @@ public class Compiler {
         configMgr.getConfig(name).isRunning = false;
     }
 }
+//
