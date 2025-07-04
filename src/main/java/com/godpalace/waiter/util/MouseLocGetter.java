@@ -1,4 +1,4 @@
-package com.godpalace.waiter.Util;
+package com.godpalace.waiter.util;
 
 import javax.swing.*;
 import javax.swing.text.JTextComponent;

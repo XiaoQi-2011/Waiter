@@ -3,17 +3,18 @@ package com.godpalace.waiter.execute;
 import com.godpalace.waiter.Main;
 import com.godpalace.waiter.config.Config;
 import com.godpalace.waiter.config.ConfigMgr;
+import lombok.Getter;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.InputEvent;
-import java.awt.event.KeyEvent;
 import java.io.*;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
-import java.util.Vector;
 
 public class Compiler {
+    @Getter
     private static String Error;
     private static final ConfigMgr configMgr = Main.configMgr;
     private static final Map<String, Thread> threads = new HashMap<>();
@@ -63,7 +64,7 @@ public class Compiler {
 
                 for (Command.Cmd cmd : command.commands) {
                     String cmdStr = cmd.cmd;
-                    Vector<Integer> values = cmd.values;
+                    List<Integer> values = cmd.values;
 
                     if (cmdStr.equals("PressMouse")) {
                         int value = values.get(0);
@@ -158,7 +159,7 @@ public class Compiler {
         return result.toString().trim();
     }
 
-    public static Command compile(String path) throws Exception {
+    public static Command compile(String path) throws IOException {
         Command c = new Command();
         ErrorMgr errorMgr = new ErrorMgr();
 
@@ -207,6 +208,7 @@ public class Compiler {
                     errorMgr.addError(lineNum, ErrorMgr.ErrorType.ERROR_VALUE);
                     break;
                 }
+
                 cmd.values.add(v);
             }
             c.addCommand(cmd);
@@ -218,10 +220,6 @@ public class Compiler {
         } else {
             return c;
         }
-    }
-
-    public static String getError() {
-        return Error;
     }
 
     public void createThread(String name) {
@@ -265,4 +263,3 @@ public class Compiler {
         configMgr.getConfig(name).isRunning = false;
     }
 }
-//

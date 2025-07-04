@@ -1,20 +1,24 @@
-package com.godpalace.waiter.GUI;
+package com.godpalace.waiter.gui;
 
 import com.godpalace.waiter.Main;
 import com.godpalace.waiter.config.Config;
 import com.godpalace.waiter.config.ConfigMgr;
 
 import javax.swing.*;
+import java.awt.*;
 import java.io.File;
 import java.io.IOException;
 
 public class UIFrame extends JFrame {
-
     public static ConfigPanel configPanel;
     public static FilePanel filePanel;
     public static JTabbedPane tabbedPane = new JTabbedPane();
+
+    public static TrayIcon trayIcon;
+
     public UIFrame() {
         setTitle("Waiter " + Main.VERSION);
+        setIconImage(Toolkit.getDefaultToolkit().getImage(getClass().getResource("/texture.png")));
         setSize(600, 400);
         setLocation(250, 250);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -95,8 +99,8 @@ public class UIFrame extends JFrame {
                     file.createNewFile();
                 }
                 Main.configMgr.addConfig(new Config(name, path));
-                Main.configMgr.save();
                 configPanel.updateConfigPanel();
+                Main.configMgr.save();
             } catch (Exception ex) {
                 throw new RuntimeException(ex);
             }
@@ -144,11 +148,11 @@ public class UIFrame extends JFrame {
 
         JMenuItem item6 = new JMenuItem("修改全局热键");
         item6.addActionListener(e -> {
-            String key = JOptionPane.showInputDialog(Main.frame, "请输入热键：", ConfigMgr.Allkey);
+            String key = JOptionPane.showInputDialog(Main.frame, "请输入热键：", ConfigMgr.enableKey);
             if (key == null || key.isEmpty()) {
-                ConfigMgr.Allkey = "None";
+                ConfigMgr.enableKey = "None";
             } else {
-                ConfigMgr.Allkey = key;
+                ConfigMgr.enableKey = key;
             }
             try {
                 Main.configMgr.save();
@@ -160,12 +164,12 @@ public class UIFrame extends JFrame {
 
         JMenuItem item8 = new JMenuItem("修改记录器热键");
         item8.addActionListener(e -> {
-            String key = JOptionPane.showInputDialog(Main.frame, "请输入热键：", ConfigMgr.Recordkey);
+            String key = JOptionPane.showInputDialog(Main.frame, "请输入热键：", ConfigMgr.recordkey);
             if (key == null || key.isEmpty()) {
-                ConfigMgr.Recordkey = "None";
+                ConfigMgr.recordkey = "None";
             }
             else {
-                ConfigMgr.Recordkey = key;
+                ConfigMgr.recordkey = key;
             }
             try {
                 Main.configMgr.save();
@@ -187,5 +191,30 @@ public class UIFrame extends JFrame {
         menuBar.add(menu3);//
 
         setJMenuBar(menuBar);
+
+        //System Tray
+        try {
+            if (SystemTray.isSupported()) {
+                SystemTray tray = SystemTray.getSystemTray();
+                PopupMenu popup = new PopupMenu();
+                MenuItem item9 = new MenuItem("显示/隐藏");
+                item9.addActionListener(e -> Main.frame.setVisible(!Main.frame.isShowing()));
+                popup.add(item9);
+
+                MenuItem item10 = new MenuItem("退出");
+                item10.addActionListener(e -> System.exit(0));
+                popup.add(item10);
+
+                trayIcon = new TrayIcon(Toolkit.getDefaultToolkit().getImage(getClass().getResource("/texture.png")), "Waiter", popup);
+                trayIcon.addActionListener(e -> {
+                    Main.frame.setVisible(true);
+                    Main.frame.toFront();
+                });
+                trayIcon.setImageAutoSize(true);
+                tray.add(trayIcon);
+            }
+        } catch (Exception ex) {
+            throw new RuntimeException(ex);
+        }
     }
 }

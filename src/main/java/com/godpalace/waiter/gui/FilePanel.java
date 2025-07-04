@@ -1,19 +1,17 @@
-package com.godpalace.waiter.GUI;
+package com.godpalace.waiter.gui;
 
 import com.godpalace.waiter.Main;
-import com.godpalace.waiter.Util.MouseLocGetter;
 import com.godpalace.waiter.config.Config;
-import com.godpalace.waiter.config.ConfigMgr;
 import com.godpalace.waiter.execute.Command;
 import com.godpalace.waiter.execute.Compiler;
+import com.godpalace.waiter.util.MouseLocGetter;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.*;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import java.io.File;
-import java.io.IOException;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class FilePanel extends JPanel {
@@ -34,6 +32,7 @@ public class FilePanel extends JPanel {
     public JTextArea MainPanel = new JTextArea();
     public JLabel Title = new JLabel();
     public JPanel toolPanel = new JPanel();
+
     private String oldContent = "";
     public FilePanel() {
         setBackground(new Color(246, 246, 246));
@@ -58,7 +57,6 @@ public class FilePanel extends JPanel {
                     String replace = value.substring(0, value.indexOf(':') + 1);
                     MainPanel.setText(text + replace);
                 } else {
-                    String text = MainPanel.getText();
                     String replace = value.substring(0, value.indexOf(':') + 1);
                     MainPanel.replaceSelection(replace);
                 }
@@ -110,13 +108,13 @@ public class FilePanel extends JPanel {
             @Override
             public JToolTip createToolTip() {
                 JToolTip toolTip = new JToolTip();
+                toolTip.setTipText("获取键盘按键");
                 toolTip.setBackground(Color.WHITE);
                 return toolTip;
             }
         };
         getkeyButton.setMargin(new Insets(0, 0, 0, 0));
         getkeyButton.setBackground(Color.WHITE);
-        getkeyButton.setToolTipText("获取键盘按键");
         getkeyButton.setPreferredSize(new Dimension(20, 20));
         AtomicBoolean isGetkey = new AtomicBoolean(false);
         getkeyButton.addActionListener(e -> {
@@ -140,17 +138,15 @@ public class FilePanel extends JPanel {
             @Override
             public JToolTip createToolTip() {
                 JToolTip toolTip = new JToolTip();
+                toolTip.setTipText("获取鼠标位置");
                 toolTip.setBackground(Color.WHITE);
                 return toolTip;
             }
         };
         getLocButton.setMargin(new Insets(0, 0, 0, 0));
-        getLocButton.setToolTipText("获取鼠标位置");
         getLocButton.setBackground(Color.WHITE);
         getLocButton.setPreferredSize(new Dimension(20, 20));
-        getLocButton.addActionListener(e -> {
-            MouseLocGetter.outputMouseLoc(MainPanel);
-        });
+        getLocButton.addActionListener(e -> MouseLocGetter.outputMouseLoc(MainPanel));
         toolPanel.add(getLocButton);
 
         JPanel topPanel = new JPanel();
@@ -160,18 +156,27 @@ public class FilePanel extends JPanel {
 
         add(topPanel, BorderLayout.NORTH);
         add(new JScrollPane(MainPanel), BorderLayout.CENTER);
+        setEnable(false);
+    }
+
+    public void setEnable(boolean enabled) {
+        MainPanel.setEnabled(enabled);
+        Title.setText(enabled ? file.getName() : " ");
+        toolPanel.setEnabled(enabled);
+
+        for (Component component : toolPanel.getComponents()) {
+            component.setEnabled(enabled);
+        }
     }
 
     public void setName(String name) {
         this.name = name;
         this.file = new File(Main.configMgr.getConfig(name).path);
-        if (!file.exists()) {
-            try {
-                file.createNewFile();
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
+        if (!file.exists() || file == null) {
+            setEnable(false);
+            return;
         }
+
         try {
             String content = new String(Files.readAllBytes(file.toPath()));
             MainPanel.setText(content);
@@ -179,12 +184,14 @@ public class FilePanel extends JPanel {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+        setEnable(true);
     }
 
     public void save() throws Exception {
         if (file == null || name.isEmpty()) {
             return;
         }
+
         String content = MainPanel.getText();
         oldContent = content;
         Files.write(file.toPath(), content.getBytes());
@@ -197,6 +204,5 @@ public class FilePanel extends JPanel {
         } else {
             config.command = command;
         }
-
     }
 }

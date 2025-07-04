@@ -1,8 +1,7 @@
-package com.godpalace.waiter.GUI;
+package com.godpalace.waiter.gui;
 
 import com.godpalace.waiter.Main;
 import com.godpalace.waiter.config.Config;
-import com.godpalace.waiter.execute.Compiler;
 
 import javax.swing.*;
 import java.awt.*;
@@ -16,9 +15,10 @@ public class SettingPanel extends JPanel {
     public int height = 140;
     public JLabel titleLabel = new JLabel("设置 []");
     public JSpinner delayTextField = new JSpinner(new SpinnerNumberModel(5, 1, 1000, 1));
-    public JTextField keyBindTextField = new JTextField("none");
+    public JTextField keyBindTextField = new JTextField("None");
     public JCheckBox isWhileChecked = new JCheckBox("", true);
     public JTextArea fileLabel = new JTextArea("");
+    public JButton fileButton;
 
     public JPanel centerPanel = new JPanel();
     public SettingPanel() {
@@ -48,6 +48,8 @@ public class SettingPanel extends JPanel {
         whilePanel.add(isWhileChecked, BorderLayout.EAST);
         centerPanel.add(whilePanel);
         centerPanel.add(Box.createRigidArea(new Dimension(0, 5)));
+
+        keyBindTextField.setEnabled(false);
 
         JPanel keyBindPanel = new JPanel();
         keyBindPanel.setBackground(Color.WHITE);
@@ -82,7 +84,7 @@ public class SettingPanel extends JPanel {
         fileButtonPanel.setBackground(Color.WHITE);
         fileButtonPanel.setLayout(new FlowLayout(FlowLayout.CENTER));
 
-        JButton fileButton = new JButton("修改");
+        fileButton = new JButton("修改");
         fileButton.setPreferredSize(new Dimension(35, 30));
         fileButton.setMargin(new Insets(0, 0, 0, 0));
         fileButton.setBackground(Color.WHITE);
@@ -112,7 +114,6 @@ public class SettingPanel extends JPanel {
         filePanel.add(fileButtonPanel, BorderLayout.EAST);
         centerPanel.add(filePanel);
 
-
         JPanel panel = new JPanel();
         panel.setLayout(null);
         panel.add(centerPanel);
@@ -133,7 +134,7 @@ public class SettingPanel extends JPanel {
         Config config = Main.configMgr.getConfig(name);
         titleLabel.setText("设置 [" + config.name + "]");
         isWhileChecked.setSelected(config.isWhile);
-        keyBindTextField.setText(config.keybind);
+        keyBindTextField.setText(config.keyBind);
         delayTextField.setValue(config.runDelay);
         File file = new File(config.path);
         fileLabel.setText(file.getAbsolutePath());
@@ -143,7 +144,7 @@ public class SettingPanel extends JPanel {
         Config config = Main.configMgr.getConfig(name);
         config.runDelay = (int) delayTextField.getValue();
         config.isWhile = isWhileChecked.isSelected();
-        config.keybind = keyBindTextField.getText();
+        config.keyBind = keyBindTextField.getText();
         Main.configMgr.save();
     }
 
@@ -192,5 +193,6 @@ public class SettingPanel extends JPanel {
         keyBindTextField.setEnabled(enabled);
         isWhileChecked.setEnabled(enabled);
         fileLabel.setEnabled(enabled);
+        fileButton.setEnabled(enabled);
     }
 }

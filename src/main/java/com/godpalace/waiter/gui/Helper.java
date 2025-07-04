@@ -1,4 +1,4 @@
-package com.godpalace.waiter.Event;
+package com.godpalace.waiter.gui;
 
 import com.godpalace.waiter.Main;
 
@@ -29,17 +29,17 @@ public class Helper extends JFrame {
         helpText = new JTextPane();
         helpText.setEditable(false);
         helpText.setOpaque(false);
-        addHelpText("Waiter: 一款用于执行鼠标和键盘操作的软件。 ", new Color(2, 170, 145), HelpType.BOLD, 20);
-        addHelpText("作者：XiaoQi", Color.GREEN, HelpType.ITAL, 15);
-        addHelpText("公司：GodPalace", Color.MAGENTA, HelpType.ITAL, 15);
-        addHelpText("版本：" + Main.VERSION + "\n", Color.BLUE, HelpType.ITAL, 15);
+        addHelpText("Waiter: 一款用于执行鼠标和键盘操作的软件。 ", Color.BLUE, HelpType.BOLD, 20);
+        addHelpText("作者：XiaoQi, PVPkin", Color.ORANGE, HelpType.ITAL, 15);
+        addHelpText("公司：GodPalace", Color.ORANGE, HelpType.ITAL, 15);
+        addHelpText("版本：" + Main.VERSION + "\n", Color.ORANGE, HelpType.ITAL, 15);
 
-        addHelpText("[!]注意：", Color.ORANGE, HelpType.BOLD_UNDERLINE, 16);
+        addHelpText("[!]注意：", Color.RED, HelpType.BOLD_UNDERLINE, 16);
         addHelpText("如果程序卡死或发生闪退请重启程序，若无效可能是因为配置文件语法错误或保存文件(Config.ini)错误，删除或重新编辑即可。\n", Color.BLACK, HelpType.BOLD, 16);
 
         addHelpText("[i]说明：", new Color(0, 157, 255), HelpType.BOLD_UNDERLINE, 16);
         addHelpText("在[文件]中的文本框右键可以打开快捷输入菜单。", Color.BLACK, HelpType.BOLD, 16);
-        addHelpText("[K]按钮是获取键盘按键，[L]按钮是获取鼠标位置。", Color.BLACK, HelpType.BOLD, 16);
+        addHelpText("[G]按钮获取数字对应的键值，[K]按钮是获取键盘按键，[P]按钮是获取鼠标位置。", Color.BLACK, HelpType.BOLD, 16);
         addHelpText("1是左键，2是右键，3是中键。(鼠标)\n", Color.BLACK, HelpType.BOLD, 16);
 
         addHelpText("配置文件命令格式：", Color.BLACK, HelpType.BOLD_UNDERLINE, 16);
@@ -51,7 +51,7 @@ public class Helper extends JFrame {
                 MoveMouse2:<dx>,<dy>  移动鼠标相对位置
                 PressKey:<键值>       按下键盘键
                 ReleaseKey:<键值>     释放键盘键
-                ClickKey:<键值>        单击键盘键
+                ClickKey:<键值>       单击键盘键
                 Sleep:<毫秒>          等待指定时间
                 """, Color.BLACK, HelpType.BOLD, 16);
 

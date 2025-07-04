@@ -9,15 +9,15 @@ import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class ConfigMgr {
-    public static final String TAG = "config.ini";
-    public static String Allkey = "F6";
-    public static String Recordkey = "F7";
+    public static final String TAG = "config.cfg";
+    public static String enableKey = "F6";
+    public static String recordkey = "F7";
     public static final AtomicBoolean AllRunning = new AtomicBoolean(false);
     public static Map<String, Config> configMap = new HashMap<>();
 
     public ConfigMgr() {}
 
-    public void addConfig(Config config) throws Exception {
+    public void addConfig(Config config) throws IOException {
         config.command = Compiler.compile(config.path);
         configMap.put(config.name, config);
         Main.compiler.createThread(config.name);
@@ -46,36 +46,41 @@ public class ConfigMgr {
             file.createNewFile();
         }
         FileOutputStream fos = new FileOutputStream(file);
-        fos.write(("All " + Allkey + "\n").getBytes());
-        fos.write(("Record " + Recordkey + "\n").getBytes());
+        fos.write(("Enable " + enableKey + "\n").getBytes());
+        fos.write(("Record " + recordkey + "\n").getBytes());
         for (Config config : configMap.values()) {
             String text = "Config " + config.name + " "
                     + config.path + " "
                     + config.runDelay + " "
                     + (config.isWhile? "true" : "false") + " "
-                    + (config.keybind == null ? "None" : config.keybind);
+                    + (config.keyBind == null ? "None" : config.keyBind);
             fos.write((text +"\n").getBytes());
         }
         fos.close();
     }
 
-    public void load() throws Exception {
+    public void load() throws IOException, IllegalArgumentException {
         File file = new File(TAG);
         if (!file.exists()) {
             return;
         }
+
         FileInputStream fis = new FileInputStream(file);
         InputStreamReader inputStreamReader = new InputStreamReader(fis);
         BufferedReader reader = new BufferedReader(inputStreamReader);
         String line;
 
         while ((line = reader.readLine())!= null) {
-            if (line.startsWith("All ")) {
-                Allkey = line.split(" ")[1];
+            if (line.startsWith("Enable ")) {
+                enableKey = line.split(" ")[1];
+                continue;
             }
+
             if (line.startsWith("Record ")) {
-                Recordkey = line.split(" ")[1];
+                recordkey = line.split(" ")[1];
+                continue;
             }
+
             if (line.startsWith("Config ")) {
                 String[] parts = line.split(" ");
                 String name = parts[1];
@@ -85,8 +90,12 @@ public class ConfigMgr {
                 String keybind = (parts[5] == null ? "None" : parts[5]);
                 Config config = new Config(name, path, runDelay, isWhile, keybind);
                 addConfig(config);
+                continue;
             }
+
+            throw new IllegalArgumentException("语法错误, 在第" + line + "行中");
         }
+
         fis.close();
     }
 }

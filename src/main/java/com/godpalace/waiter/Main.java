@@ -1,18 +1,21 @@
 package com.godpalace.waiter;
 
 import com.github.kwhat.jnativehook.GlobalScreen;
-import com.godpalace.waiter.Event.Binder;
-import com.godpalace.waiter.Event.Helper;
-import com.godpalace.waiter.Event.Recorder;
-import com.godpalace.waiter.GUI.UIFrame;
+import com.github.kwhat.jnativehook.NativeHookException;
+import com.godpalace.waiter.event.Binder;
+import com.godpalace.waiter.gui.Helper;
+import com.godpalace.waiter.event.Recorder;
+import com.godpalace.waiter.gui.UIFrame;
 import com.godpalace.waiter.config.ConfigMgr;
 import com.godpalace.waiter.execute.Compiler;
+import lombok.extern.slf4j.Slf4j;
 
 import javax.swing.*;
 import javax.swing.filechooser.FileFilter;
 import java.io.File;
+import java.io.IOException;
 
-
+@Slf4j
 public class Main {
     // Constant
     public static final String FILE_TYPE = "wait";
@@ -31,8 +34,12 @@ public class Main {
     public static UIFrame frame;
     public static final JFileChooser fileChooser = new JFileChooser();
 
-    public static void main(String[] args) throws Exception {
-        GlobalScreen.registerNativeHook();
+    public static void main(String[] args) {
+        try {
+            GlobalScreen.registerNativeHook();
+        } catch (NativeHookException e) {
+            JOptionPane.showMessageDialog(null, "初始化监听器失败, 请检查防火墙并重启应用(" + e.getMessage() + ")");
+        }
 
         fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
         FileFilter filter = new FileFilter() {
@@ -41,7 +48,7 @@ public class Main {
                 if (f.isDirectory()) {
                     return true;
                 } else {
-                    return f.getName().toLowerCase().endsWith(Main.FILE_TYPE);
+                    return f.getName().toLowerCase().endsWith("." + Main.FILE_TYPE);
                 }
             }
 
@@ -57,7 +64,15 @@ public class Main {
         fileChooser.setFileFilter(filter);
 
         binder.start();
-        configMgr.load();
+
+        try {
+            configMgr.load();
+        } catch (IllegalArgumentException e) {
+            JOptionPane.showMessageDialog(null, e.getMessage());
+        } catch (IOException e) {
+            JOptionPane.showMessageDialog(null, "IO异常: " + e.getMessage());
+            Thread.currentThread().interrupt();
+        }
 
         frame = new UIFrame();
         frame.setVisible(true);

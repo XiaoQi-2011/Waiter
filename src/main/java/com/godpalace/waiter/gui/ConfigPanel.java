@@ -1,4 +1,4 @@
-package com.godpalace.waiter.GUI;
+package com.godpalace.waiter.gui;
 
 import com.godpalace.waiter.config.Config;
 import com.godpalace.waiter.config.ConfigMgr;
@@ -48,6 +48,7 @@ public class ConfigPanel extends JSplitPane {
                         listModel.set(columnNames.indexOf(config.name), config.name);
                     }
                 }
+
                 try {
                     Thread.sleep(10);
                 } catch (InterruptedException e) {

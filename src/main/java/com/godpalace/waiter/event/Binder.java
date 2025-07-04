@@ -1,4 +1,4 @@
-package com.godpalace.waiter.Event;
+package com.godpalace.waiter.event;
 
 import com.github.kwhat.jnativehook.GlobalScreen;
 import com.github.kwhat.jnativehook.keyboard.NativeKeyEvent;
@@ -6,8 +6,6 @@ import com.github.kwhat.jnativehook.keyboard.NativeKeyListener;
 import com.godpalace.waiter.Main;
 import com.godpalace.waiter.config.Config;
 import com.godpalace.waiter.config.ConfigMgr;
-import com.godpalace.waiter.execute.Compiler;
-
 
 public class Binder {
 
@@ -17,7 +15,7 @@ public class Binder {
         @Override
         public void nativeKeyReleased(NativeKeyEvent e) {
             String key = NativeKeyEvent.getKeyText(e.getKeyCode());
-            if (key.equals(ConfigMgr.Allkey)) {
+            if (key.equals(ConfigMgr.enableKey)) {
                 ConfigMgr.AllRunning.set(!ConfigMgr.AllRunning.get());
                 if (ConfigMgr.AllRunning.get()) {
                     System.out.println(" ");
@@ -32,20 +30,20 @@ public class Binder {
                     Main.compiler.stopAll();
                 }
             }
-            if (key.equals(ConfigMgr.Recordkey)) {
+            if (key.equals(ConfigMgr.recordkey)) {
                 if (Main.recorder.isRecording()) {
                     System.out.println(" ");
                     System.out.println("[*]<Record> Stop.");
-                    Main.recorder.stopRecording();
+                    Main.recorder.stopRecord();
                     Main.recorder.saveRecords();
                 } else {
                     System.out.println(" ");
                     System.out.println("[*]<Record> Start.");
-                    Main.recorder.startRecording();
+                    Main.recorder.startRecord();
                 }
             }
             for (Config config : ConfigMgr.configMap.values()) {
-                if (key.equals(config.keybind)) {
+                if (key.equals(config.keyBind)) {
                     System.out.println(" ");
                     if (config.isRunning) {
                         System.out.println("[*]<" + config.name + "> Stop.");

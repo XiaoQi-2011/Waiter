@@ -9,14 +9,14 @@ public class Config {
     public boolean isWhile;
     public boolean isRunning = false;
     public Command command;
-    public String keybind;
+    public String keyBind;
 
     public Config(String name, String path, int runDelay, boolean isWhile, String keybind) {
         this.name = name;
         this.path = path;
         this.runDelay = runDelay;
         this.isWhile = isWhile;
-        this.keybind = keybind;
+        this.keyBind = keybind;
     }
 
     public Config(String name, String path){
@@ -24,6 +24,6 @@ public class Config {
         this.path = path;
         this.runDelay = 5;
         this.isWhile = true;
-        this.keybind = "None";
+        this.keyBind = "None";
     }
 }

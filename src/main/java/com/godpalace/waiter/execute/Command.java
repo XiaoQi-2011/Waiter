@@ -1,21 +1,22 @@
 package com.godpalace.waiter.execute;
 
-import java.util.Vector;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Command {
     public static class Cmd {
         public String cmd;
-        public Vector<Integer> values;
+        public List<Integer> values;
 
         public Cmd() {
-            this.cmd ="";
-            values = new Vector<Integer>();
+            this.cmd = "";
+            values = new ArrayList<>();
         }
     }
-    Vector<Cmd> commands;
+    List<Cmd> commands;
 
     public Command() {
-        commands = new Vector<Cmd>();
+        commands = new ArrayList<>();
     }
 
     public void addCommand(Cmd cmd) {
@@ -28,7 +29,7 @@ public class Command {
                 return c;
             }
         }
+
         return null;
     }
 }
-//

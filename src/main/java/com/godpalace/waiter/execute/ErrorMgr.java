@@ -1,13 +1,13 @@
 package com.godpalace.waiter.execute;
 
-import java.util.Vector;
+import java.util.ArrayList;
+import java.util.List;
 
 public class ErrorMgr {
-
-    private final Vector<Error> errors;
+    private final List<Error> errors;
     private boolean isError;
     public ErrorMgr() {
-        errors = new Vector<>();
+        errors = new ArrayList<>();
         isError = false;
     }
 
@@ -24,7 +24,7 @@ public class ErrorMgr {
         StringBuilder sb = new StringBuilder();
         for (Error error : errors) {
             if (error!= null) {
-                String errorString;
+                String errorString = "未知错误";
                 if (error.error == ErrorType.ERROR_STRUCTURE) {
                     errorString = "命令格式错误";
                 }
@@ -34,9 +34,7 @@ public class ErrorMgr {
                 else if (error.error == ErrorType.ERROR_VALUE) {
                     errorString = "参数错误";
                 }
-                else {
-                    errorString = "未知错误";
-                }
+
                 sb.append("[第").append(error.index).append("行] ").append(errorString).append("\n");
             }
         }
@@ -52,10 +50,10 @@ public class ErrorMgr {
             this.error = error;
         }
     }
+
     public enum ErrorType {
-        ERROR_STRUCTURE,
         ERROR_COMMAND,
-        ERROR_VALUE,
-        ERROR_UNKNOWN
+        ERROR_STRUCTURE,
+        ERROR_VALUE
     }
 }
