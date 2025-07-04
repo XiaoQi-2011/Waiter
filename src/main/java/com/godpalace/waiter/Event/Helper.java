@@ -1,4 +1,6 @@
-package com.godpalace.waiter;
+package com.godpalace.waiter.Event;
+
+import com.godpalace.waiter.Main;
 
 import javax.swing.*;
 import javax.swing.text.*;
@@ -26,7 +28,8 @@ public class Helper extends JFrame {
 
         helpText = new JTextPane();
         helpText.setEditable(false);
-        addHelpText("Waiter: 一款用于执行鼠标和键盘操作的软件。 ", Color.CYAN, HelpType.BOLD, 20);
+        helpText.setOpaque(false);
+        addHelpText("Waiter: 一款用于执行鼠标和键盘操作的软件。 ", new Color(2, 170, 145), HelpType.BOLD, 20);
         addHelpText("作者：XiaoQi", Color.GREEN, HelpType.ITAL, 15);
         addHelpText("公司：GodPalace", Color.MAGENTA, HelpType.ITAL, 15);
         addHelpText("版本：" + Main.VERSION + "\n", Color.BLUE, HelpType.ITAL, 15);

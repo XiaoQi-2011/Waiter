@@ -74,8 +74,8 @@ public class SettingPanel extends JPanel {
         fileLabel.setEditable(false);
         fileLabel.setLineWrap(true);
         fileLabel.setWrapStyleWord(true);
-        fileLabel.setBackground(Color.WHITE);
         fileLabel.setOpaque(false);
+        fileLabel.setBackground(Color.WHITE);
         filePanel.add(fileLabel, BorderLayout.CENTER);
 
         JPanel fileButtonPanel = new JPanel();
@@ -135,7 +135,8 @@ public class SettingPanel extends JPanel {
         isWhileChecked.setSelected(config.isWhile);
         keyBindTextField.setText(config.keybind);
         delayTextField.setValue(config.runDelay);
-        fileLabel.setText(config.path);
+        File file = new File(config.path);
+        fileLabel.setText(file.getAbsolutePath());
     }
 
     public void saveConfig() throws IOException {

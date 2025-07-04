@@ -4,6 +4,7 @@ import com.godpalace.waiter.Main;
 import com.godpalace.waiter.config.Config;
 import com.godpalace.waiter.config.ConfigMgr;
 
+import javax.swing.*;
 import java.awt.*;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
@@ -13,8 +14,20 @@ import java.util.Map;
 import java.util.Vector;
 
 public class Compiler {
+    private static String Error;
     private static final ConfigMgr configMgr = Main.configMgr;
     private static final Map<String, Thread> threads = new HashMap<>();
+    private static final String[] COMMANDS = {
+            "PressMouse",
+            "ReleaseMouse",
+            "ClickMouse",
+            "PressKey",
+            "ReleaseKey",
+            "ClickKey",
+            "MoveMouse",
+            "MoveMouse2",
+            "Sleep"
+    };
 
     private static class ThreadClass implements Runnable {
         String name;
@@ -41,6 +54,10 @@ public class Compiler {
                     continue;
                 }
                 Command command = configMgr.getConfig(name).command;
+                if (command == null) {
+                    configMgr.getConfig(name).isRunning = false;
+                    continue;
+                }
                 int runDelay = configMgr.getConfig(name).runDelay;
                 robot.setAutoDelay(runDelay);
 
@@ -143,31 +160,68 @@ public class Compiler {
 
     public static Command compile(String path) throws Exception {
         Command c = new Command();
+        ErrorMgr errorMgr = new ErrorMgr();
 
         FileInputStream fileInputStream;
         InputStreamReader inputStreamReader;
         BufferedReader reader;
         String line;
 
+        if (!new File(path).exists()) {
+            return null;
+        }
         fileInputStream = new FileInputStream(path);
         inputStreamReader = new InputStreamReader(fileInputStream);
         reader = new BufferedReader(inputStreamReader);
 
+        int lineNum = 0;
         while ((line = reader.readLine())!= null) {
+            lineNum++;
             line = SplitSpace(line);
 
             String[] cmds = line.split(":");
             Command.Cmd cmd = new Command.Cmd();
+            if (cmds.length != 2) {
+                errorMgr.addError(lineNum, ErrorMgr.ErrorType.ERROR_STRUCTURE);
+                continue;
+            }
             cmd.cmd = cmds[0];
+            boolean isCommand = false;
+            for (String command : COMMANDS) {
+                if (cmd.cmd.equals(command)) {
+                    isCommand = true;
+                    break;
+                }
+            }
+            if (!isCommand) {
+                errorMgr.addError(lineNum, ErrorMgr.ErrorType.ERROR_COMMAND);
+                continue;
+            }
             String[] values = cmds[1].split(",");
 
             for (String value : values) {
-                cmd.values.add(Integer.parseInt(value));
+                int v;
+                try {
+                    v = Integer.parseInt(value);
+                } catch (NumberFormatException e) {
+                    errorMgr.addError(lineNum, ErrorMgr.ErrorType.ERROR_VALUE);
+                    break;
+                }
+                cmd.values.add(v);
             }
             c.addCommand(cmd);
         }
 
-        return c;
+        if (errorMgr.isError()) {
+            Error = errorMgr.getErrorMessage();
+            return null;
+        } else {
+            return c;
+        }
+    }
+
+    public static String getError() {
+        return Error;
     }
 
     public void createThread(String name) {
@@ -182,15 +236,15 @@ public class Compiler {
 
     public void executeAll() {
         for (Config config : ConfigMgr.configMap.values()) {
-            config.isRunning = true;
-            String name = config.name;
-            if (!threads.get(name).isAlive()) {
-                threads.get(name).start();
-            }
+            execute(config.name);
         }
     }
 
     public void execute(String name) {
+        if (configMgr.getConfig(name).command == null) {
+            JOptionPane.showMessageDialog(null, "运行失败，请检查配置文件是否正确！", "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
         configMgr.getConfig(name).isRunning = true;
         if (!configMgr.hasConfig(name)) {
             throw new IllegalArgumentException("No such config: " + name);
@@ -203,7 +257,7 @@ public class Compiler {
 
     public void stopAll() {
         for (Config config : ConfigMgr.configMap.values()) {
-            config.isRunning = false;
+            stop(config.name);
         }
     }
 

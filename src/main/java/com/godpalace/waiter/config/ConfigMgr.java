@@ -1,5 +1,6 @@
 package com.godpalace.waiter.config;
 
+import com.godpalace.waiter.Main;
 import com.godpalace.waiter.execute.Compiler;
 
 import java.io.*;
@@ -10,6 +11,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 public class ConfigMgr {
     public static final String TAG = "config.ini";
     public static String Allkey = "F6";
+    public static String Recordkey = "F7";
     public static final AtomicBoolean AllRunning = new AtomicBoolean(false);
     public static Map<String, Config> configMap = new HashMap<>();
 
@@ -18,6 +20,7 @@ public class ConfigMgr {
     public void addConfig(Config config) throws Exception {
         config.command = Compiler.compile(config.path);
         configMap.put(config.name, config);
+        Main.compiler.createThread(config.name);
     }
 
     public Config getConfig(String name) {
@@ -26,6 +29,7 @@ public class ConfigMgr {
 
     public void removeConfig(String name) {
         configMap.remove(name);
+        Main.compiler.removeThread(name);
     }
 
     public void clearConfig() {
@@ -43,6 +47,7 @@ public class ConfigMgr {
         }
         FileOutputStream fos = new FileOutputStream(file);
         fos.write(("All " + Allkey + "\n").getBytes());
+        fos.write(("Record " + Recordkey + "\n").getBytes());
         for (Config config : configMap.values()) {
             String text = "Config " + config.name + " "
                     + config.path + " "
@@ -54,7 +59,7 @@ public class ConfigMgr {
         fos.close();
     }
 
-    public void load(Compiler compiler) throws Exception {
+    public void load() throws Exception {
         File file = new File(TAG);
         if (!file.exists()) {
             return;
@@ -68,6 +73,9 @@ public class ConfigMgr {
             if (line.startsWith("All ")) {
                 Allkey = line.split(" ")[1];
             }
+            if (line.startsWith("Record ")) {
+                Recordkey = line.split(" ")[1];
+            }
             if (line.startsWith("Config ")) {
                 String[] parts = line.split(" ");
                 String name = parts[1];
@@ -80,9 +88,5 @@ public class ConfigMgr {
             }
         }
         fis.close();
-        for (Config config : configMap.values()){
-            compiler.createThread(config.name);
-        }
     }
 }
-//

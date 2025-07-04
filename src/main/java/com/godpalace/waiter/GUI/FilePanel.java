@@ -65,16 +65,6 @@ public class FilePanel extends JPanel {
             });
             popupMenu.add(menuItem);
         }
-        popupMenu.addSeparator();
-        JMenuItem getkeyItem = new JMenuItem("获取选中数字键值");
-        getkeyItem.addActionListener(e -> {
-            if (MainPanel.getSelectedText()!= null) {
-                String text = MainPanel.getSelectedText();
-                int keyCode = Integer.parseInt(text);
-                JOptionPane.showMessageDialog(Main.frame, "键值: " + KeyEvent.getKeyText(keyCode));
-            }
-        });
-        popupMenu.add(getkeyItem);
 
         MainPanel.setComponentPopupMenu(popupMenu);
         MainPanel.addKeyListener(new KeyAdapter() {
@@ -93,6 +83,28 @@ public class FilePanel extends JPanel {
                 }
             }
         });
+
+        JButton replaceButton = new JButton("G") {
+            @Override
+            public JToolTip createToolTip() {
+                JToolTip toolTip = new JToolTip();
+                toolTip.setBackground(Color.WHITE);
+                return toolTip;
+            }
+        };
+        replaceButton.setMargin(new Insets(0, 0, 0, 0));
+        replaceButton.setBackground(Color.WHITE);
+        replaceButton.setToolTipText("获取数字对应的键值");
+        replaceButton.setPreferredSize(new Dimension(20, 20));
+        replaceButton.addActionListener(e -> {
+            String text = JOptionPane.showInputDialog(Main.frame, "请输入数字：", "获取键值", JOptionPane.PLAIN_MESSAGE);
+            if (text!= null) {
+                int keyCode = Integer.parseInt(text);
+                String key = KeyEvent.getKeyText(keyCode);
+                JOptionPane.showMessageDialog(Main.frame, "键值：" + key);
+            }
+        });
+        toolPanel.add(replaceButton);
 
         JButton getkeyButton = new JButton("K") {
             @Override
@@ -153,6 +165,13 @@ public class FilePanel extends JPanel {
     public void setName(String name) {
         this.name = name;
         this.file = new File(Main.configMgr.getConfig(name).path);
+        if (!file.exists()) {
+            try {
+                file.createNewFile();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
         try {
             String content = new String(Files.readAllBytes(file.toPath()));
             MainPanel.setText(content);
@@ -168,11 +187,16 @@ public class FilePanel extends JPanel {
         }
         String content = MainPanel.getText();
         oldContent = content;
-        String path = file.getAbsolutePath();
         Files.write(file.toPath(), content.getBytes());
-        Main.configMgr.getConfig(name).command = Compiler.compile(path);
-        Main.configMgr.save();
         Title.setText(file.getName());
+
+        Config config = Main.configMgr.getConfig(name);
+        Command command = Compiler.compile(config.path);
+        if (command == null) {
+            JOptionPane.showMessageDialog(Main.frame, Compiler.getError(), "[" + name + "] 编译失败", JOptionPane.ERROR_MESSAGE);
+        } else {
+            config.command = command;
+        }
+
     }
 }
-//

@@ -1,6 +1,9 @@
 package com.godpalace.waiter;
 
 import com.github.kwhat.jnativehook.GlobalScreen;
+import com.godpalace.waiter.Event.Binder;
+import com.godpalace.waiter.Event.Helper;
+import com.godpalace.waiter.Event.Recorder;
 import com.godpalace.waiter.GUI.UIFrame;
 import com.godpalace.waiter.config.ConfigMgr;
 import com.godpalace.waiter.execute.Compiler;
@@ -11,16 +14,23 @@ import java.io.File;
 
 
 public class Main {
+    // Constant
     public static final String FILE_TYPE = "wait";
-    public static final String VERSION = "v4.3";
+    public static final String VERSION = "v4.4";
 
+    // Event
+    public static final Recorder recorder = new Recorder();
     public static final Helper helper = new Helper();
-    public static final ConfigMgr configMgr = new ConfigMgr();
-    public static final Compiler compiler = new Compiler();
     public static final Binder binder = new Binder();
 
+    // Execute
+    public static final ConfigMgr configMgr = new ConfigMgr();
+    public static final Compiler compiler = new Compiler();
+
+    // GUI
     public static UIFrame frame;
     public static final JFileChooser fileChooser = new JFileChooser();
+
     public static void main(String[] args) throws Exception {
         GlobalScreen.registerNativeHook();
 
@@ -47,7 +57,7 @@ public class Main {
         fileChooser.setFileFilter(filter);
 
         binder.start();
-        configMgr.load(compiler);
+        configMgr.load();
 
         frame = new UIFrame();
         frame.setVisible(true);

@@ -5,13 +5,14 @@ import com.godpalace.waiter.config.ConfigMgr;
 
 import javax.swing.*;
 import java.awt.*;
-import java.io.File;
+import java.util.Vector;
 
 public class ConfigPanel extends JSplitPane {
     public static SettingPanel settingsPanel = new SettingPanel();
     public static JList<String> configList = new JList<>();
     public static DefaultListModel<String> listModel = new DefaultListModel<>();
 
+    private static final Vector<String> columnNames = new Vector<>();
     public ConfigPanel() {
         setLeftComponent(new JScrollPane(settingsPanel));
         setRightComponent(new JScrollPane(configList));
@@ -26,7 +27,7 @@ public class ConfigPanel extends JSplitPane {
                 return;
             }
             settingsPanel.setEnables(true);
-            String configName = configList.getSelectedValue();
+            String configName = columnNames.get(configList.getSelectedIndex());
             UIFrame.filePanel.setName(configName);
             settingsPanel.setConfigName(configName);
             settingsPanel.loadConfig();
@@ -40,14 +41,28 @@ public class ConfigPanel extends JSplitPane {
             while (true) {
                 settingsPanel.centerPanel.setSize(settingsPanel.getWidth(),
                         settingsPanel.height + settingsPanel.fileLabel.getPreferredSize().height);
+                for (Config config : ConfigMgr.configMap.values()) {
+                    if (config.isRunning) {
+                        listModel.set(columnNames.indexOf(config.name), config.name + " (运行中)");
+                    } else {
+                        listModel.set(columnNames.indexOf(config.name), config.name);
+                    }
+                }
+                try {
+                    Thread.sleep(10);
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
             }
         }).start();
     }
 
     public void updateConfigPanel() {
         listModel.clear();
+        columnNames.clear();
         for (Config config : ConfigMgr.configMap.values()) {
             listModel.addElement(config.name);
+            columnNames.add(config.name);
         }
         if (!listModel.isEmpty()) {
             configList.setSelectedIndex(0);

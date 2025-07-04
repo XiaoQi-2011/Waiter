@@ -1,15 +1,15 @@
-package com.godpalace.waiter;
+package com.godpalace.waiter.Event;
 
 import com.github.kwhat.jnativehook.GlobalScreen;
 import com.github.kwhat.jnativehook.keyboard.NativeKeyEvent;
 import com.github.kwhat.jnativehook.keyboard.NativeKeyListener;
+import com.godpalace.waiter.Main;
 import com.godpalace.waiter.config.Config;
 import com.godpalace.waiter.config.ConfigMgr;
 import com.godpalace.waiter.execute.Compiler;
 
 
 public class Binder {
-    private static final Compiler compiler = Main.compiler;
 
     public Binder() {}
 
@@ -23,13 +23,25 @@ public class Binder {
                     System.out.println(" ");
                     System.out.println("[*]<All> Run.");
                     try {
-                        compiler.executeAll();
+                        Main.compiler.executeAll();
                     } catch (Exception ex) {
                         throw new RuntimeException(ex);
                     }
                 } else {
                     System.out.println("[*]<All> Stop.");
-                    compiler.stopAll();
+                    Main.compiler.stopAll();
+                }
+            }
+            if (key.equals(ConfigMgr.Recordkey)) {
+                if (Main.recorder.isRecording()) {
+                    System.out.println(" ");
+                    System.out.println("[*]<Record> Stop.");
+                    Main.recorder.stopRecording();
+                    Main.recorder.saveRecords();
+                } else {
+                    System.out.println(" ");
+                    System.out.println("[*]<Record> Start.");
+                    Main.recorder.startRecording();
                 }
             }
             for (Config config : ConfigMgr.configMap.values()) {
@@ -37,11 +49,11 @@ public class Binder {
                     System.out.println(" ");
                     if (config.isRunning) {
                         System.out.println("[*]<" + config.name + "> Stop.");
-                        compiler.stop(config.name);
+                        Main.compiler.stop(config.name);
                     } else {
                         System.out.println("[*]<" + config.name + "> Run.");
                         try {
-                            compiler.execute(config.name);
+                            Main.compiler.execute(config.name);
                         } catch (Exception ex) {
                             throw new RuntimeException(ex);
                         }

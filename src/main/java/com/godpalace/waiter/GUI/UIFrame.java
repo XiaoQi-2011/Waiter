@@ -52,7 +52,6 @@ public class UIFrame extends JFrame {
             }
             try {
                 Main.configMgr.addConfig(new Config(name, path));
-                Main.compiler.createThread(name);
                 Main.configMgr.save();
                 configPanel.updateConfigPanel();
             } catch (Exception ex) {
@@ -74,7 +73,6 @@ public class UIFrame extends JFrame {
             }
             try {
                 Main.configMgr.removeConfig(name);
-                Main.compiler.removeThread(name);
                 Main.configMgr.save();
             } catch (IOException ex) {
                 throw new RuntimeException(ex);
@@ -97,7 +95,6 @@ public class UIFrame extends JFrame {
                     file.createNewFile();
                 }
                 Main.configMgr.addConfig(new Config(name, path));
-                Main.compiler.createThread(name);
                 Main.configMgr.save();
                 configPanel.updateConfigPanel();
             } catch (Exception ex) {
@@ -161,10 +158,27 @@ public class UIFrame extends JFrame {
         });
         menu2.add(item6);
 
+        JMenuItem item8 = new JMenuItem("修改记录器热键");
+        item8.addActionListener(e -> {
+            String key = JOptionPane.showInputDialog(Main.frame, "请输入热键：", ConfigMgr.Recordkey);
+            if (key == null || key.isEmpty()) {
+                ConfigMgr.Recordkey = "None";
+            }
+            else {
+                ConfigMgr.Recordkey = key;
+            }
+            try {
+                Main.configMgr.save();
+            } catch (IOException ex) {
+                throw new RuntimeException(ex);
+            }
+        });
+        menu2.add(item8);
+
         menuBar.add(menu2);//
 
         JMenu menu3 = new JMenu("帮助");//
-        JMenuItem item7 = new JMenuItem("关于");
+        JMenuItem item7 = new JMenuItem("说明");
         item7.addActionListener(e -> {
             Main.helper.setVisible(true);
         });
