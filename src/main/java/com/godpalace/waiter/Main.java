@@ -15,7 +15,6 @@ import javax.swing.filechooser.FileFilter;
 import java.io.File;
 import java.io.IOException;
 
-@Slf4j
 public class Main {
     // Constant
     public static final String FILE_TYPE = "wait";
