@@ -3,12 +3,11 @@ package com.godpalace.waiter;
 import com.github.kwhat.jnativehook.GlobalScreen;
 import com.github.kwhat.jnativehook.NativeHookException;
 import com.godpalace.waiter.event.Binder;
-import com.godpalace.waiter.gui.Helper;
+import com.godpalace.waiter.event.Helper;
 import com.godpalace.waiter.event.Recorder;
 import com.godpalace.waiter.gui.UIFrame;
 import com.godpalace.waiter.config.ConfigMgr;
 import com.godpalace.waiter.execute.Compiler;
-import lombok.extern.slf4j.Slf4j;
 
 import javax.swing.*;
 import javax.swing.filechooser.FileFilter;

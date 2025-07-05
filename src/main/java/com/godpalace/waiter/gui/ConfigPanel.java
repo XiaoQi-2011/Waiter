@@ -42,9 +42,13 @@ public class ConfigPanel extends JSplitPane {
                 settingsPanel.centerPanel.setSize(settingsPanel.getWidth(),
                         settingsPanel.height + settingsPanel.fileLabel.getPreferredSize().height);
                 for (Config config : ConfigMgr.configMap.values()) {
-                    if (config.isRunning) {
+                    if (!columnNames.contains(config.name)) {
+                        continue;
+                    }
+                    boolean isRunning = listModel.get(columnNames.indexOf(config.name)).endsWith("(运行中)");
+                    if (config.isRunning && !isRunning) {
                         listModel.set(columnNames.indexOf(config.name), config.name + " (运行中)");
-                    } else {
+                    } else if (!config.isRunning && isRunning) {
                         listModel.set(columnNames.indexOf(config.name), config.name);
                     }
                 }

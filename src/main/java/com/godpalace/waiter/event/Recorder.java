@@ -25,9 +25,12 @@ public class Recorder {
     public boolean recordMouseLocation = true;
     public boolean recordKeyboardInput = true;
     public boolean recordMouseClicks = true;
+    public boolean recordSleep = false;
     public boolean messageTooltip = true;
 
     private boolean isRecording = false;
+    private int sleepTime = 0;
+    private final Timer timer = new Timer(1, e -> sleepTime++);
 
     private void KeyEvent(String type, NativeKeyEvent nativeEvent) {
         if (recordKeyboardInput) {
@@ -38,6 +41,18 @@ public class Recorder {
             keyCode = KeyCodeGetter.getKeyEventCode(keyCode);
             String key = String.format(type + ":%s", keyCode);
             records.add(key);
+
+            if (recordSleep) {
+                if (type.equals("PressKey")) {
+                    sleepTime = 0;
+                    timer.restart();
+                } else if (type.equals("ReleaseKey")) {
+                    timer.stop();
+                    if (sleepTime > 0) {
+                        records.add("Sleep:" + sleepTime);
+                    }
+                }
+            }
         }
     }
 
@@ -62,7 +77,6 @@ public class Recorder {
             KeyEvent("PressKey", nativeEvent);
         }
 
-
         @Override
         public void nativeKeyReleased(NativeKeyEvent nativeEvent) {
             KeyEvent("ReleaseKey", nativeEvent);
@@ -84,6 +98,7 @@ public class Recorder {
         public void nativeMouseReleased(NativeMouseEvent nativeEvent) {
             MouseEvent("ReleaseMouse", nativeEvent);
         }
+
     };
 
     public Recorder() {}
@@ -91,7 +106,7 @@ public class Recorder {
     public void startRecord() {
         isRecording = true;
         if (messageTooltip) {
-            UIFrame.trayIcon.displayMessage("Waiter", "步骤记录器启动", TrayIcon.MessageType.INFO);
+            UIFrame.trayIcon.displayMessage("Waiter", "步骤记录器启动 (" + ConfigMgr.recordkey + " 关闭)", TrayIcon.MessageType.INFO);
         }
         GlobalScreen.addNativeKeyListener(keyListener);
         GlobalScreen.addNativeMouseListener(mouseListener);

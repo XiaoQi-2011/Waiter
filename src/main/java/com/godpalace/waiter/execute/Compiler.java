@@ -240,7 +240,7 @@ public class Compiler {
 
     public void execute(String name) {
         if (configMgr.getConfig(name).command == null) {
-            JOptionPane.showMessageDialog(null, "运行失败，请检查配置文件是否正确！", "Error", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(Main.frame, "运行失败，请检查配置文件是否正确！", "Error", JOptionPane.ERROR_MESSAGE);
             return;
         }
         configMgr.getConfig(name).isRunning = true;

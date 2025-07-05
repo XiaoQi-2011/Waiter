@@ -6,6 +6,8 @@ import com.godpalace.waiter.config.ConfigMgr;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.io.File;
 import java.io.IOException;
 
@@ -14,6 +16,7 @@ public class UIFrame extends JFrame {
     public static FilePanel filePanel;
     public static JTabbedPane tabbedPane = new JTabbedPane();
 
+    private static boolean closeExit = false;
     public static TrayIcon trayIcon;
 
     public UIFrame() {
@@ -21,7 +24,16 @@ public class UIFrame extends JFrame {
         setIconImage(Toolkit.getDefaultToolkit().getImage(getClass().getResource("/texture.png")));
         setSize(600, 400);
         setLocation(250, 250);
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent e) {
+                if (closeExit) {
+                    System.exit(0);
+                } else {
+                    UIFrame.this.setVisible(false);
+                }
+            }
+        });
 
         filePanel = new FilePanel();
         configPanel = new ConfigPanel();
@@ -38,19 +50,22 @@ public class UIFrame extends JFrame {
         JMenu menu = new JMenu("文件");//
         JMenuItem item1 = new JMenuItem("添加配置");
         item1.addActionListener(e -> {
-            String path = "";
+            String path;
             int result = Main.fileChooser.showOpenDialog(Main.frame);
-            File file = null;
-            if (result == JFileChooser.APPROVE_OPTION) {
-                file = Main.fileChooser.getSelectedFile();
-                if (!file.getName().toLowerCase().endsWith(Main.FILE_TYPE)) {
-                    JOptionPane.showMessageDialog(Main.frame, "文件格式不正确！", "错误", JOptionPane.ERROR_MESSAGE);
-                    return;
-                }
-                path = file.getAbsolutePath();
+            File file;
+            if (result != JFileChooser.APPROVE_OPTION) {
+                return;
             }
+            file = Main.fileChooser.getSelectedFile();
+            if (!file.getName().toLowerCase().endsWith(Main.FILE_TYPE)) {
+                JOptionPane.showMessageDialog(Main.frame, "文件格式不正确！", "错误", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+            path = file.getAbsolutePath();
+
             String initialName = file.getName().substring(0, file.getName().lastIndexOf("."));
             String name = JOptionPane.showInputDialog(Main.frame, "请输入配置名称：", initialName);
+
             if (name == null || name.isEmpty()) {
                 return;
             }
@@ -72,7 +87,7 @@ public class UIFrame extends JFrame {
                 return;
             }
             int result = JOptionPane.showConfirmDialog(Main.frame, "确认删除配置？", "警告", JOptionPane.YES_NO_OPTION);
-            if (result == JOptionPane.NO_OPTION) {
+            if (result != JOptionPane.YES_OPTION) {
                 return;
             }
             try {
@@ -82,6 +97,7 @@ public class UIFrame extends JFrame {
                 throw new RuntimeException(ex);
             }
             ConfigPanel.settingsPanel.setEnables(false);
+            UIFrame.filePanel.setEnables(false);
             configPanel.updateConfigPanel();
         });
         menu.add(item2);
@@ -142,6 +158,32 @@ public class UIFrame extends JFrame {
         });
         menu1.add(item5);
 
+        JMenuItem item13 = new JMenuItem("删除配置文件");
+        item13.addActionListener(e -> {
+            String name = filePanel.name;
+            if (name == null || name.isEmpty()) {
+                return;
+            }
+            int result = JOptionPane.showConfirmDialog(Main.frame, "确认删除配置文件？", "警告", JOptionPane.YES_NO_OPTION);
+            if (result != JOptionPane.YES_OPTION) {
+                return;
+            }
+            try {
+                File file = new File(Main.configMgr.getConfig(name).path);
+                if (file.exists()) {
+                    file.delete();
+                }
+                UIFrame.filePanel.setName("");
+                Main.configMgr.getConfig(name).path = "";
+                Main.configMgr.getConfig(name).isRunning = false;
+                Main.configMgr.save();
+            } catch (IOException ex) {
+                throw new RuntimeException(ex);
+            }
+            ConfigPanel.settingsPanel.loadConfig();
+        });
+        menu1.add(item13);
+
         menuBar.add(menu1);//
 
         JMenu menu2 = new JMenu("设置");//
@@ -178,6 +220,32 @@ public class UIFrame extends JFrame {
             }
         });
         menu2.add(item8);
+
+        JMenuItem item11 = new JMenuItem("禁用所有快捷键");
+        item11.addActionListener(e -> {
+            if (Main.binder.isRunning()) {
+                Main.binder.stop();
+                trayIcon.displayMessage("Waiter", "所有快捷键已禁用！", TrayIcon.MessageType.INFO);
+                item11.setText("启用所有快捷键");
+            } else {
+                Main.binder.start();
+                trayIcon.displayMessage("Waiter", "所有快捷键已启用！", TrayIcon.MessageType.INFO);
+                item11.setText("禁用所有快捷键");
+            }
+        });
+        menu2.add(item11);
+
+        JMenuItem item12 = new JMenuItem("最小化到托盘 [开启]");
+        item12.addActionListener(e -> {
+            if (closeExit) {
+                closeExit = false;
+                item12.setText("最小化到托盘 [开启]");
+            } else {
+                closeExit = true;
+                item12.setText("最小化到托盘 [关闭]");
+            }
+        });
+        menu2.add(item12);
 
         menuBar.add(menu2);//
 

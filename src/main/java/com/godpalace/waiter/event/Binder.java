@@ -6,10 +6,15 @@ import com.github.kwhat.jnativehook.keyboard.NativeKeyListener;
 import com.godpalace.waiter.Main;
 import com.godpalace.waiter.config.Config;
 import com.godpalace.waiter.config.ConfigMgr;
+import lombok.Getter;
+
+import javax.annotation.processing.Generated;
 
 public class Binder {
 
     public Binder() {}
+    @Getter
+    private boolean isRunning = false;
 
     private final NativeKeyListener keyListener = new NativeKeyListener() {
         @Override
@@ -63,9 +68,11 @@ public class Binder {
 
     public void start(){
         GlobalScreen.addNativeKeyListener(keyListener);
+        isRunning = true;
     }
 
     public void stop(){
         GlobalScreen.removeNativeKeyListener(keyListener);
+        isRunning = false;
     }
 }

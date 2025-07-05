@@ -1,4 +1,4 @@
-package com.godpalace.waiter.gui;
+package com.godpalace.waiter.event;
 
 import com.godpalace.waiter.Main;
 

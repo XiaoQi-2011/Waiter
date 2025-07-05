@@ -65,22 +65,19 @@ public class FilePanel extends JPanel {
         }
 
         MainPanel.setComponentPopupMenu(popupMenu);
-        MainPanel.addKeyListener(new KeyAdapter() {
-            @Override
-            public void keyPressed(KeyEvent e) {
-                if (!MainPanel.getText().equals(oldContent)) {
-                    Title.setText("*" + file.getName());
-                    oldContent = MainPanel.getText();
+        new Thread(() -> {
+            while (true) {
+                try {
+                    Thread.sleep(100);
+                    if (!MainPanel.getText().equals(oldContent)) {
+                        Title.setText("*" + file.getName());
+                        oldContent = MainPanel.getText();
+                    }
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
                 }
             }
-            @Override
-            public void keyReleased(KeyEvent e) {
-                if (!MainPanel.getText().equals(oldContent)) {
-                    Title.setText("*" + file.getName());
-                    oldContent = MainPanel.getText();
-                }
-            }
-        });
+        }).start();
 
         JButton replaceButton = new JButton("G") {
             @Override
@@ -156,11 +153,14 @@ public class FilePanel extends JPanel {
 
         add(topPanel, BorderLayout.NORTH);
         add(new JScrollPane(MainPanel), BorderLayout.CENTER);
-        setEnable(false);
+        setEnables(false);
     }
 
-    public void setEnable(boolean enabled) {
+    public void setEnables(boolean enabled) {
         MainPanel.setEnabled(enabled);
+        if (!enabled) {
+            MainPanel.setText("");
+        }
         Title.setText(enabled ? file.getName() : " ");
         toolPanel.setEnabled(enabled);
 
@@ -171,9 +171,13 @@ public class FilePanel extends JPanel {
 
     public void setName(String name) {
         this.name = name;
+        if (name == null || name.isEmpty() || !Main.configMgr.hasConfig(name)) {
+            setEnables(false);
+            return;
+        }
         this.file = new File(Main.configMgr.getConfig(name).path);
         if (!file.exists() || file == null) {
-            setEnable(false);
+            setEnables(false);
             return;
         }
 
@@ -184,11 +188,11 @@ public class FilePanel extends JPanel {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
-        setEnable(true);
+        setEnables(true);
     }
 
     public void save() throws Exception {
-        if (file == null || name.isEmpty()) {
+        if (file == null || name == null || name.isEmpty()) {
             return;
         }
 

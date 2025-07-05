@@ -89,7 +89,7 @@ public class SettingPanel extends JPanel {
         fileButton.setMargin(new Insets(0, 0, 0, 0));
         fileButton.setBackground(Color.WHITE);
         fileButton.addActionListener(e -> {
-            int result = Main.fileChooser.showOpenDialog(null);
+            int result = Main.fileChooser.showOpenDialog(Main.frame);
             if (result == JFileChooser.APPROVE_OPTION) {
                 String path;
                 File file = Main.fileChooser.getSelectedFile();
@@ -194,5 +194,9 @@ public class SettingPanel extends JPanel {
         isWhileChecked.setEnabled(enabled);
         fileLabel.setEnabled(enabled);
         fileButton.setEnabled(enabled);
+
+        if (!enabled) {
+            titleLabel.setText("设置 []");
+        }
     }
 }
