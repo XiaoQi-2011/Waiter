@@ -40,6 +40,7 @@ public class Binder {
                     System.out.println(" ");
                     System.out.println("[*]<Record> Stop.");
                     Main.recorder.stopRecord();
+                    Main.frame.toFront();
                     Main.recorder.saveRecords();
                 } else {
                     System.out.println(" ");
@@ -74,5 +75,9 @@ public class Binder {
     public void stop(){
         GlobalScreen.removeNativeKeyListener(keyListener);
         isRunning = false;
+    }
+
+    public boolean isRunning() {
+        return isRunning;
     }
 }

@@ -33,7 +33,7 @@ public class FilePanel extends JPanel {
     public JLabel Title = new JLabel();
     public JPanel toolPanel = new JPanel();
 
-    private String oldContent = "";
+    private String oldContent = null;
     public FilePanel() {
         setBackground(new Color(246, 246, 246));
         setLayout(new BorderLayout());
@@ -69,6 +69,7 @@ public class FilePanel extends JPanel {
             while (true) {
                 try {
                     Thread.sleep(100);
+                    if (oldContent == null) continue;
                     if (!MainPanel.getText().equals(oldContent)) {
                         Title.setText("*" + file.getName());
                         oldContent = MainPanel.getText();

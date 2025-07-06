@@ -30,6 +30,10 @@ public class Compiler {
             "Sleep"
     };
 
+    public static String getError() {
+        return Error;
+    }
+
     private static class ThreadClass implements Runnable {
         String name;
 

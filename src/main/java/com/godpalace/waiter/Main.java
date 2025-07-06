@@ -17,7 +17,7 @@ import java.io.IOException;
 public class Main {
     // Constant
     public static final String FILE_TYPE = "wait";
-    public static final String VERSION = "v4.4";
+    public static final String VERSION = "v4.5";
 
     // Event
     public static final Recorder recorder = new Recorder();

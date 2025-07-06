@@ -221,6 +221,12 @@ public class UIFrame extends JFrame {
         });
         menu2.add(item8);
 
+        JMenuItem item16 = new JMenuItem("修改记录器配置");
+        item16.addActionListener(e -> {
+            Main.recorder.showSaveFrame();
+        });
+        menu2.add(item16);
+
         JMenuItem item11 = new JMenuItem("禁用所有快捷键");
         item11.addActionListener(e -> {
             if (Main.binder.isRunning()) {
@@ -248,6 +254,43 @@ public class UIFrame extends JFrame {
         menu2.add(item12);
 
         menuBar.add(menu2);//
+
+        JMenu menu4 = new JMenu("功能");//
+        JMenuItem item14 = new JMenuItem("运行/停止所有配置");
+        item14.addActionListener(e -> {ConfigMgr.AllRunning.set(!ConfigMgr.AllRunning.get());
+            if (ConfigMgr.AllRunning.get()) {
+                System.out.println(" ");
+                System.out.println("[*]<All> Run.");
+                try {
+                    Main.compiler.executeAll();
+                } catch (Exception ex) {
+                    throw new RuntimeException(ex);
+                }
+            } else {
+                System.out.println("[*]<All> Stop.");
+                Main.compiler.stopAll();
+            }
+        });
+        menu4.add(item14);
+
+        JMenuItem item15 = new JMenuItem("启动/停止步骤记录器");
+        item15.addActionListener(e -> {
+            if (Main.recorder.isRecording()) {
+                System.out.println(" ");
+                System.out.println("[*]<Record> Stop.");
+                Main.recorder.stopRecord();
+                Main.recorder.saveRecords();
+                Main.frame.toFront();
+            } else {
+                System.out.println(" ");
+                System.out.println("[*]<Record> Start.");
+                Main.recorder.startRecord();
+                Main.frame.toBack();
+            }
+        });
+        menu4.add(item15);
+
+        menuBar.add(menu4);//
 
         JMenu menu3 = new JMenu("帮助");//
         JMenuItem item7 = new JMenuItem("说明");
