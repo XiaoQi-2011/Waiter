@@ -30,10 +30,6 @@ public class Compiler {
             "Sleep"
     };
 
-    public static String getError() {
-        return Error;
-    }
-
     private static class ThreadClass implements Runnable {
         String name;
 
@@ -217,6 +213,10 @@ public class Compiler {
             }
             c.addCommand(cmd);
         }
+
+        fileInputStream.close();
+        inputStreamReader.close();
+        reader.close();
 
         if (errorMgr.isError()) {
             Error = errorMgr.getErrorMessage();

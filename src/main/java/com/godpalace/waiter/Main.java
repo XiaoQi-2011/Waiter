@@ -11,13 +11,15 @@ import com.godpalace.waiter.execute.Compiler;
 
 import javax.swing.*;
 import javax.swing.filechooser.FileFilter;
+import java.awt.*;
 import java.io.File;
 import java.io.IOException;
 
 public class Main {
     // Constant
     public static final String FILE_TYPE = "wait";
-    public static final String VERSION = "v4.5";
+    public static final String VERSION = "v4.6";
+    public static final Image ICON = new ImageIcon(Toolkit.getDefaultToolkit().getImage(Main.class.getResource("/texture.png"))).getImage();
 
     // Event
     public static final Recorder recorder = new Recorder();

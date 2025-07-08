@@ -33,7 +33,7 @@ public class FilePanel extends JPanel {
     public JLabel Title = new JLabel();
     public JPanel toolPanel = new JPanel();
 
-    private String oldContent = null;
+    private String oldContent = "";
     public FilePanel() {
         setBackground(new Color(246, 246, 246));
         setLayout(new BorderLayout());
@@ -69,7 +69,6 @@ public class FilePanel extends JPanel {
             while (true) {
                 try {
                     Thread.sleep(100);
-                    if (oldContent == null) continue;
                     if (!MainPanel.getText().equals(oldContent)) {
                         Title.setText("*" + file.getName());
                         oldContent = MainPanel.getText();
@@ -106,13 +105,13 @@ public class FilePanel extends JPanel {
             @Override
             public JToolTip createToolTip() {
                 JToolTip toolTip = new JToolTip();
-                toolTip.setTipText("获取键盘按键");
                 toolTip.setBackground(Color.WHITE);
                 return toolTip;
             }
         };
         getkeyButton.setMargin(new Insets(0, 0, 0, 0));
         getkeyButton.setBackground(Color.WHITE);
+        getkeyButton.setToolTipText("获取键盘按键");
         getkeyButton.setPreferredSize(new Dimension(20, 20));
         AtomicBoolean isGetkey = new AtomicBoolean(false);
         getkeyButton.addActionListener(e -> {
@@ -136,13 +135,13 @@ public class FilePanel extends JPanel {
             @Override
             public JToolTip createToolTip() {
                 JToolTip toolTip = new JToolTip();
-                toolTip.setTipText("获取鼠标位置");
                 toolTip.setBackground(Color.WHITE);
                 return toolTip;
             }
         };
         getLocButton.setMargin(new Insets(0, 0, 0, 0));
         getLocButton.setBackground(Color.WHITE);
+        getLocButton.setToolTipText("获取鼠标位置");
         getLocButton.setPreferredSize(new Dimension(20, 20));
         getLocButton.addActionListener(e -> MouseLocGetter.outputMouseLoc(MainPanel));
         toolPanel.add(getLocButton);
@@ -185,6 +184,7 @@ public class FilePanel extends JPanel {
         try {
             String content = new String(Files.readAllBytes(file.toPath()));
             MainPanel.setText(content);
+            oldContent = content;
             Title.setText(file.getName());
         } catch (Exception e) {
             throw new RuntimeException(e);

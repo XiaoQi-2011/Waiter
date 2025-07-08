@@ -8,8 +8,10 @@ import com.github.kwhat.jnativehook.mouse.NativeMouseListener;
 import com.godpalace.waiter.Main;
 import com.godpalace.waiter.config.Config;
 import com.godpalace.waiter.config.ConfigMgr;
+import com.godpalace.waiter.gui.FilePanel;
 import com.godpalace.waiter.gui.UIFrame;
 import com.godpalace.waiter.util.KeyCodeGetter;
+import lombok.Getter;
 
 import javax.swing.*;
 import java.awt.*;
@@ -22,6 +24,7 @@ import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class Recorder {
     public final List<String> records = Collections.synchronizedList(new ArrayList<>());
@@ -30,26 +33,23 @@ public class Recorder {
     private boolean recordKeyboardInput = true;
     private boolean recordMouseClicks = true;
 
-    private boolean recordSleep = false;
-    private int minSleepTime = 500;
+    private final AtomicBoolean recordSleep = new AtomicBoolean(false);
+    private int minSleepTime = 300;
+    private int sleepTime = 0;
 
-    private boolean AutoRecordMove = false;
+    private final AtomicBoolean AutoRecordMove = new AtomicBoolean(false);
     private int AutoRecordMoveTime = 200;
 
     private boolean messageTooltip = true;
 
-    private boolean isRecording = false;
-    private int sleepTime = 0;
-    private final Timer timer = new Timer(1, e -> sleepTime++);
-    private final JFrame frame = new JFrame("步骤记录器配置修改");
+    private final AtomicBoolean isRecording = new AtomicBoolean(false);
 
+    private final JFrame frame = new JFrame("步骤记录器配置修改");
     private void KeyEvent(String type, NativeKeyEvent nativeEvent) {
-        if (recordSleep) {
+        if (recordSleep.get()) {
             if (type.equals("PressKey")) {
                 sleepTime = 0;
-                timer.restart();
             } else if (type.equals("ReleaseKey")) {
-                timer.stop();
                 if (sleepTime > minSleepTime) {
                     System.out.println("Sleep:" + sleepTime + "ms, " + minSleepTime + "ms");
                     records.add("Sleep:" + sleepTime);
@@ -68,12 +68,10 @@ public class Recorder {
     }
 
     private void MouseEvent(String type, NativeMouseEvent nativeEvent) {
-        if (recordSleep) {
+        if (recordSleep.get()) {
             if (type.equals("PressMouse")) {
                 sleepTime = 0;
-                timer.restart();
             } else if (type.equals("ReleaseMouse")) {
-                timer.stop();
                 if (sleepTime > minSleepTime) {
                     System.out.println("Sleep:" + sleepTime);
                     records.add("Sleep:" + sleepTime);
@@ -127,7 +125,7 @@ public class Recorder {
     public Recorder() {
         new Thread(() -> {
             while (true) {
-                if (AutoRecordMove) {
+                if (AutoRecordMove.get() && isRecording.get()) {
                     int x = MouseInfo.getPointerInfo().getLocation().x;
                     int y = MouseInfo.getPointerInfo().getLocation().y;
                     records.add("MoveMouse:" + x + "," + y);
@@ -139,13 +137,25 @@ public class Recorder {
                 }
             }
         }).start();
+        new Thread(() -> {
+            while (true) {
+                if (recordSleep.get() && isRecording.get()) {
+                    sleepTime += 1;
+                }
+                try {
+                    Thread.sleep(1);
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        }).start();
 
         initSaveFrame();
     }
 
     public void startRecord() {
         records.clear();
-        isRecording = true;
+        isRecording.set(true);
         if (messageTooltip) {
             UIFrame.trayIcon.displayMessage("Waiter", "步骤记录器启动 (" + ConfigMgr.recordkey + " 关闭)", TrayIcon.MessageType.INFO);
         }
@@ -154,7 +164,7 @@ public class Recorder {
     }
 
     public void stopRecord() {
-        isRecording = false;
+        isRecording.set(false);
         if (messageTooltip) {
             UIFrame.trayIcon.displayMessage("Waiter", "步骤记录器停止", TrayIcon.MessageType.INFO);
         }
@@ -176,9 +186,16 @@ public class Recorder {
     public void saveRecords() {
         String records = getRecordText();
         String fileName = "Record_" + System.currentTimeMillis() + "." + Main.FILE_TYPE;
-        String filePath = JOptionPane.showInputDialog("输入保存文件路径:", fileName);
+        String filePath = JOptionPane.showInputDialog("输入保存文件路径 (不输入则保存到当前配置):", fileName);
 
-        if (filePath == null) {
+        if (filePath == null || filePath.isEmpty()) {
+            FilePanel filePanel = UIFrame.filePanel;
+            filePanel.MainPanel.setText(records);
+            try {
+                filePanel.save();
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
             return;
         }
 
@@ -205,6 +222,7 @@ public class Recorder {
         frame.setSize(320, 250);
         frame.setLocation(350, 350);
         frame.setBackground(Color.WHITE);
+        frame.setIconImage(Main.ICON);
         frame.setResizable(false);
         frame.addWindowListener(new WindowAdapter() {
             @Override
@@ -236,9 +254,9 @@ public class Recorder {
         panel.add(recordKeyboardInputCheck);
 
         JCheckBox recordSleepCheck = new JCheckBox("记录等待时间(Sleep)");
-        recordSleepCheck.setSelected(recordSleep);
+        recordSleepCheck.setSelected(recordSleep.get());
         recordSleepCheck.setBackground(Color.WHITE);
-        recordSleepCheck.addActionListener(e -> recordSleep = recordSleepCheck.isSelected());
+        recordSleepCheck.addActionListener(e -> recordSleep.set(recordSleepCheck.isSelected()));
         panel.add(recordSleepCheck);
 
         JPanel minSleepTimePanel = new JPanel();
@@ -263,9 +281,9 @@ public class Recorder {
         panel.add(messageTooltipCheck);
 
         JCheckBox AutoRecordMoveCheck = new JCheckBox("自动记录鼠标移动");
-        AutoRecordMoveCheck.setSelected(AutoRecordMove);
+        AutoRecordMoveCheck.setSelected(AutoRecordMove.get());
         AutoRecordMoveCheck.setBackground(Color.WHITE);
-        AutoRecordMoveCheck.addActionListener(e -> AutoRecordMove = AutoRecordMoveCheck.isSelected());
+        AutoRecordMoveCheck.addActionListener(e -> AutoRecordMove.set(AutoRecordMoveCheck.isSelected()));
         panel.add(AutoRecordMoveCheck);
 
         JPanel AutoRecordMoveTimePanel = new JPanel();
@@ -277,7 +295,6 @@ public class Recorder {
             @Override
             public void keyReleased(KeyEvent e) {
                 String text = deletChar(AutoRecordMoveTimeField.getText());
-                System.out.println(text);
                 AutoRecordMoveTime = Integer.parseInt(text);
             }
         });
@@ -293,7 +310,7 @@ public class Recorder {
     }
 
     public boolean isRecording() {
-        return isRecording;
+        return isRecording.get();
     }
 
     private String deletChar(String str) {

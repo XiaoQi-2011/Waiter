@@ -3,6 +3,7 @@ package com.godpalace.waiter.gui;
 import com.godpalace.waiter.Main;
 import com.godpalace.waiter.config.Config;
 import com.godpalace.waiter.config.ConfigMgr;
+import lombok.Getter;
 
 import javax.swing.*;
 import java.awt.*;
@@ -10,6 +11,7 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
 
 public class UIFrame extends JFrame {
     public static ConfigPanel configPanel;
@@ -21,7 +23,7 @@ public class UIFrame extends JFrame {
 
     public UIFrame() {
         setTitle("Waiter " + Main.VERSION);
-        setIconImage(Toolkit.getDefaultToolkit().getImage(getClass().getResource("/texture.png")));
+        setIconImage(Main.ICON);
         setSize(600, 400);
         setLocation(250, 250);
         addWindowListener(new WindowAdapter() {
@@ -76,31 +78,8 @@ public class UIFrame extends JFrame {
             } catch (Exception ex) {
                 throw new RuntimeException(ex);
             }
-            //JOptionPane.showMessageDialog(Main.frame, "添加成功！");
         });
         menu.add(item1);
-
-        JMenuItem item2 = new JMenuItem("删除配置");
-        item2.addActionListener(e -> {
-            String name = ConfigPanel.configList.getSelectedValue();
-            if (name == null || name.isEmpty()) {
-                return;
-            }
-            int result = JOptionPane.showConfirmDialog(Main.frame, "确认删除配置？", "警告", JOptionPane.YES_NO_OPTION);
-            if (result != JOptionPane.YES_OPTION) {
-                return;
-            }
-            try {
-                Main.configMgr.removeConfig(name);
-                Main.configMgr.save();
-            } catch (IOException ex) {
-                throw new RuntimeException(ex);
-            }
-            ConfigPanel.settingsPanel.setEnables(false);
-            UIFrame.filePanel.setEnables(false);
-            configPanel.updateConfigPanel();
-        });
-        menu.add(item2);
 
         JMenuItem item3 = new JMenuItem("新建配置");
         item3.addActionListener(e -> {
@@ -120,13 +99,34 @@ public class UIFrame extends JFrame {
             } catch (Exception ex) {
                 throw new RuntimeException(ex);
             }
-            //JOptionPane.showMessageDialog(Main.frame, "新建成功！");
         });
         menu.add(item3);
 
+        JMenuItem item2 = new JMenuItem("删除配置");
+        item2.addActionListener(e -> {
+            String name = configPanel.getSelectedConfigName();
+            if (name == null || name.isEmpty()) {
+                return;
+            }
+            int result = JOptionPane.showConfirmDialog(Main.frame, "确认删除配置？", "警告", JOptionPane.YES_NO_OPTION);
+            if (result != JOptionPane.YES_OPTION) {
+                return;
+            }
+            try {
+                Main.configMgr.removeConfig(name);
+                Main.configMgr.save();
+            } catch (IOException ex) {
+                throw new RuntimeException(ex);
+            }
+            ConfigPanel.settingsPanel.setEnables(false);
+            UIFrame.filePanel.setEnables(false);
+            configPanel.updateConfigPanel();
+        });
+        menu.add(item2);
+
         JMenuItem item4 = new JMenuItem("运行/停止配置");
         item4.addActionListener(e -> {
-            String name = ConfigPanel.configList.getSelectedValue();
+            String name = configPanel.getSelectedConfigName();
             if (name == null || name.isEmpty()) {
                 return;
             }
@@ -171,7 +171,7 @@ public class UIFrame extends JFrame {
             try {
                 File file = new File(Main.configMgr.getConfig(name).path);
                 if (file.exists()) {
-                    file.delete();
+                    Files.delete(file.toPath());
                 }
                 UIFrame.filePanel.setName("");
                 Main.configMgr.getConfig(name).path = "";
@@ -183,6 +183,33 @@ public class UIFrame extends JFrame {
             ConfigPanel.settingsPanel.loadConfig();
         });
         menu1.add(item13);
+
+        JMenuItem item17 = new JMenuItem("彻底删除配置");
+        item17.addActionListener(e -> {
+            String name = configPanel.getSelectedConfigName();
+            if (name == null || name.isEmpty()) {
+                return;
+            }
+            int result = JOptionPane.showConfirmDialog(Main.frame, "确认彻底删除配置 (配置+文件)？", "警告", JOptionPane.YES_NO_OPTION);
+            if (result != JOptionPane.YES_OPTION) {
+                return;
+            }
+            try {
+                File file = new File(Main.configMgr.getConfig(name).path);
+                if (file.exists()) {
+                    Files.delete(file.toPath());
+                }
+
+                Main.configMgr.removeConfig(name);
+                Main.configMgr.save();
+            } catch (IOException ex) {
+                throw new RuntimeException(ex);
+            }
+            ConfigPanel.settingsPanel.setEnables(false);
+            UIFrame.filePanel.setEnables(false);
+            configPanel.updateConfigPanel();
+        });
+        menu1.add(item17);
 
         menuBar.add(menu1);//
 
@@ -316,7 +343,7 @@ public class UIFrame extends JFrame {
                 item10.addActionListener(e -> System.exit(0));
                 popup.add(item10);
 
-                trayIcon = new TrayIcon(Toolkit.getDefaultToolkit().getImage(getClass().getResource("/texture.png")), "Waiter", popup);
+                trayIcon = new TrayIcon(Main.ICON, "Waiter", popup);
                 trayIcon.addActionListener(e -> {
                     Main.frame.setVisible(true);
                     Main.frame.toFront();

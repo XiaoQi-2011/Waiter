@@ -6,6 +6,8 @@ import com.github.kwhat.jnativehook.keyboard.NativeKeyListener;
 import com.godpalace.waiter.Main;
 import com.godpalace.waiter.config.Config;
 import com.godpalace.waiter.config.ConfigMgr;
+import com.godpalace.waiter.gui.ConfigPanel;
+import com.godpalace.waiter.gui.UIFrame;
 import lombok.Getter;
 
 import javax.annotation.processing.Generated;
@@ -75,9 +77,5 @@ public class Binder {
     public void stop(){
         GlobalScreen.removeNativeKeyListener(keyListener);
         isRunning = false;
-    }
-
-    public boolean isRunning() {
-        return isRunning;
     }
 }
