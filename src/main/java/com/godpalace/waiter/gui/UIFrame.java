@@ -3,6 +3,8 @@ package com.godpalace.waiter.gui;
 import com.godpalace.waiter.Main;
 import com.godpalace.waiter.config.Config;
 import com.godpalace.waiter.config.ConfigMgr;
+import lombok.Getter;
+import lombok.SneakyThrows;
 
 import javax.swing.*;
 import java.awt.*;
@@ -17,7 +19,7 @@ public class UIFrame extends JFrame {
     public static FilePanel filePanel;
     public static JTabbedPane tabbedPane = new JTabbedPane();
 
-    private static boolean closeExit = false;
+    public static boolean closeExit = false;
     public static TrayIcon trayIcon;
 
     public UIFrame() {
@@ -26,9 +28,11 @@ public class UIFrame extends JFrame {
         setSize(600, 400);
         setLocation(250, 250);
         addWindowListener(new WindowAdapter() {
+            @SneakyThrows
             @Override
             public void windowClosing(WindowEvent e) {
                 if (closeExit) {
+                    Main.configMgr.save();
                     System.exit(0);
                 } else {
                     UIFrame.this.setVisible(false);
@@ -267,7 +271,7 @@ public class UIFrame extends JFrame {
         });
         menu2.add(item11);
 
-        JMenuItem item12 = new JMenuItem("最小化到托盘 [开启]");
+        JMenuItem item12 = new JMenuItem("最小化到托盘 " + (closeExit ? "[关闭]" : "[开启]"));
         item12.addActionListener(e -> {
             if (closeExit) {
                 closeExit = false;
@@ -339,7 +343,14 @@ public class UIFrame extends JFrame {
                 popup.add(item9);
 
                 MenuItem item10 = new MenuItem("退出");
-                item10.addActionListener(e -> System.exit(0));
+                item10.addActionListener(e -> {
+                    try {
+                        Main.configMgr.save();
+                    } catch (IOException ex) {
+                        throw new RuntimeException(ex);
+                    }
+                    System.exit(0);
+                });
                 popup.add(item10);
 
                 trayIcon = new TrayIcon(Main.ICON, "Waiter", popup);

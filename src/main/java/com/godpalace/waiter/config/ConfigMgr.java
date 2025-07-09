@@ -2,6 +2,7 @@ package com.godpalace.waiter.config;
 
 import com.godpalace.waiter.Main;
 import com.godpalace.waiter.execute.Compiler;
+import com.godpalace.waiter.gui.UIFrame;
 
 import java.io.*;
 import java.util.HashMap;
@@ -48,6 +49,7 @@ public class ConfigMgr {
         FileOutputStream fos = new FileOutputStream(file);
         fos.write(("Enable " + enableKey + "\n").getBytes());
         fos.write(("Record " + recordkey + "\n").getBytes());
+        fos.write(("isTray " + UIFrame.closeExit + "\n").getBytes());
         fos.write(("RecordSetting " + Main.recorder.getSaveString() + "\n").getBytes());
         for (Config config : configMap.values()) {
             String text = "Config " + config.name + " "
@@ -79,6 +81,11 @@ public class ConfigMgr {
 
             if (line.startsWith("Record ")) {
                 recordkey = line.split(" ")[1];
+                continue;
+            }
+
+            if (line.startsWith("isTray ")) {
+                UIFrame.closeExit = Boolean.parseBoolean(line.split(" ")[1]);
                 continue;
             }
 

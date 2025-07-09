@@ -383,6 +383,32 @@ public class Recorder {
         messageTooltip = Boolean.parseBoolean(saveArray[5]);
         AutoRecordMove.set(Boolean.parseBoolean(saveArray[6]));
         AutoRecordMoveTime = Integer.parseInt(saveArray[7]);
+
+        for (Component component : frame.getContentPane().getComponents()) {
+            if (component instanceof JCheckBox checkBox) {
+                if (checkBox.getText().equals("记录鼠标位置")) {
+                    checkBox.setSelected(recordMouseLocation);
+                } else if (checkBox.getText().equals("记录鼠标点击")) {
+                    checkBox.setSelected(recordMouseClicks);
+                } else if (checkBox.getText().equals("记录键盘输入")) {
+                    checkBox.setSelected(recordKeyboardInput);
+                } else if (checkBox.getText().equals("记录等待时间(Sleep)")) {
+                    checkBox.setSelected(recordSleep.get());
+                } else if (checkBox.getText().equals("显示提示信息")) {
+                    checkBox.setSelected(messageTooltip);
+                } else if (checkBox.getText().equals("自动记录鼠标移动")) {
+                    checkBox.setSelected(AutoRecordMove.get());
+                }
+            } else if (component instanceof JPanel panel) {
+                JLabel label = (JLabel) panel.getComponent(0);
+                JTextField textField = (JTextField) panel.getComponent(1);
+                if (label.getText().equals("最小等待时间:")) {
+                    textField.setText(String.valueOf(minSleepTime));
+                } else if (label.getText().equals("记录间隔时间:")) {
+                    textField.setText(String.valueOf(AutoRecordMoveTime));
+                }
+            }
+        }
     }
 
     private String deletChar(String str) {
