@@ -11,7 +11,6 @@ import com.godpalace.waiter.config.ConfigMgr;
 import com.godpalace.waiter.gui.FilePanel;
 import com.godpalace.waiter.gui.UIFrame;
 import com.godpalace.waiter.util.KeyCodeGetter;
-import lombok.Getter;
 
 import javax.swing.*;
 import java.awt.*;
@@ -20,6 +19,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -124,28 +124,22 @@ public class Recorder {
 
     public Recorder() {
         new Thread(() -> {
+            int Time = 0;
             while (true) {
-                if (AutoRecordMove.get() && isRecording.get()) {
+                try {
+                    Thread.sleep(1);
+                    Time += 1;
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
+                if (AutoRecordMove.get() && isRecording.get() && Time >= AutoRecordMoveTime) {
                     int x = MouseInfo.getPointerInfo().getLocation().x;
                     int y = MouseInfo.getPointerInfo().getLocation().y;
                     records.add("MoveMouse:" + x + "," + y);
+                    Time = 0;
                 }
-                try {
-                    Thread.sleep(AutoRecordMoveTime);
-                } catch (InterruptedException e) {
-                    throw new RuntimeException(e);
-                }
-            }
-        }).start();
-        new Thread(() -> {
-            while (true) {
                 if (recordSleep.get() && isRecording.get()) {
                     sleepTime += 1;
-                }
-                try {
-                    Thread.sleep(1);
-                } catch (InterruptedException e) {
-                    throw new RuntimeException(e);
                 }
             }
         }).start();
@@ -184,9 +178,12 @@ public class Recorder {
     }
 
     public void saveRecords() {
+        Main.frame.setVisible(true);
+        Main.frame.toFront();
+
         String records = getRecordText();
         String fileName = "Record_" + System.currentTimeMillis() + "." + Main.FILE_TYPE;
-        String filePath = JOptionPane.showInputDialog("输入保存文件路径 (不输入则保存到当前配置):", fileName);
+        String filePath = JOptionPane.showInputDialog(Main.frame, "输入保存文件路径 (不输入则保存到当前配置):", fileName);
 
         if (filePath == null || filePath.isEmpty()) {
             FilePanel filePanel = UIFrame.filePanel;
@@ -207,13 +204,12 @@ public class Recorder {
             }
 
             Files.write(file.toPath(), records.getBytes());
-            JOptionPane.showMessageDialog(Main.frame, "保存成功！");
 
             Main.configMgr.addConfig(new Config(fileName.substring(0, fileName.lastIndexOf('.')), filePath));
             Main.configMgr.save();
             UIFrame.configPanel.updateConfigPanel();
         } catch (Exception e) {
-            JOptionPane.showMessageDialog(Main.frame, "保存失败！");
+            JOptionPane.showMessageDialog(Main.frame, "保存失败！", "错误", JOptionPane.ERROR_MESSAGE);
             throw new RuntimeException(e);
         }
     }
@@ -238,25 +234,53 @@ public class Recorder {
         JCheckBox recordMouseLocationCheck = new JCheckBox("记录鼠标位置");
         recordMouseLocationCheck.setSelected(recordMouseLocation);
         recordMouseLocationCheck.setBackground(Color.WHITE);
-        recordMouseLocationCheck.addActionListener(e -> recordMouseLocation = recordMouseLocationCheck.isSelected());
+        recordMouseLocationCheck.addActionListener(e -> {
+            recordMouseLocation = recordMouseLocationCheck.isSelected();
+            try {
+                Main.configMgr.save();
+            } catch (IOException ex) {
+                throw new RuntimeException(ex);
+            }
+        });
         panel.add(recordMouseLocationCheck);
 
         JCheckBox recordMouseClicksCheck = new JCheckBox("记录鼠标点击");
         recordMouseClicksCheck.setSelected(recordMouseClicks);
         recordMouseClicksCheck.setBackground(Color.WHITE);
-        recordMouseClicksCheck.addActionListener(e -> recordMouseClicks = recordMouseClicksCheck.isSelected());
+        recordMouseClicksCheck.addActionListener(e -> {
+            recordMouseClicks = recordMouseClicksCheck.isSelected();
+            try {
+                Main.configMgr.save();
+            } catch (IOException ex) {
+                throw new RuntimeException(ex);
+            }
+        });
         panel.add(recordMouseClicksCheck);
 
         JCheckBox recordKeyboardInputCheck = new JCheckBox("记录键盘输入");
         recordKeyboardInputCheck.setSelected(recordKeyboardInput);
         recordKeyboardInputCheck.setBackground(Color.WHITE);
-        recordKeyboardInputCheck.addActionListener(e -> recordKeyboardInput = recordKeyboardInputCheck.isSelected());
+        recordKeyboardInputCheck.addActionListener(e -> {
+            recordKeyboardInput = recordKeyboardInputCheck.isSelected();
+            try {
+                Main.configMgr.save();
+            } catch (IOException ex) {
+                throw new RuntimeException(ex);
+            }
+        });
         panel.add(recordKeyboardInputCheck);
 
         JCheckBox recordSleepCheck = new JCheckBox("记录等待时间(Sleep)");
         recordSleepCheck.setSelected(recordSleep.get());
         recordSleepCheck.setBackground(Color.WHITE);
-        recordSleepCheck.addActionListener(e -> recordSleep.set(recordSleepCheck.isSelected()));
+        recordSleepCheck.addActionListener(e -> {
+            recordSleep.set(recordSleepCheck.isSelected());
+            try {
+                Main.configMgr.save();
+            } catch (IOException ex) {
+                throw new RuntimeException(ex);
+            }
+        });
         panel.add(recordSleepCheck);
 
         JPanel minSleepTimePanel = new JPanel();
@@ -269,6 +293,11 @@ public class Recorder {
             public void keyReleased(KeyEvent e) {
                 String text = deletChar(minSleepTimeField.getText());
                 minSleepTime = Integer.parseInt(text);
+                try {
+                    Main.configMgr.save();
+                } catch (IOException ex) {
+                    throw new RuntimeException(ex);
+                }
             }
         });
         minSleepTimePanel.add(minSleepTimeField, BorderLayout.CENTER);
@@ -277,13 +306,27 @@ public class Recorder {
         JCheckBox messageTooltipCheck = new JCheckBox("显示提示信息");
         messageTooltipCheck.setSelected(messageTooltip);
         messageTooltipCheck.setBackground(Color.WHITE);
-        messageTooltipCheck.addActionListener(e -> messageTooltip = messageTooltipCheck.isSelected());
+        messageTooltipCheck.addActionListener(e -> {
+            messageTooltip = messageTooltipCheck.isSelected();
+            try {
+                Main.configMgr.save();
+            } catch (IOException ex) {
+                throw new RuntimeException(ex);
+            }
+        });
         panel.add(messageTooltipCheck);
 
         JCheckBox AutoRecordMoveCheck = new JCheckBox("自动记录鼠标移动");
         AutoRecordMoveCheck.setSelected(AutoRecordMove.get());
         AutoRecordMoveCheck.setBackground(Color.WHITE);
-        AutoRecordMoveCheck.addActionListener(e -> AutoRecordMove.set(AutoRecordMoveCheck.isSelected()));
+        AutoRecordMoveCheck.addActionListener(e -> {
+            AutoRecordMove.set(AutoRecordMoveCheck.isSelected());
+            try {
+                Main.configMgr.save();
+            } catch (IOException ex) {
+                throw new RuntimeException(ex);
+            }
+        });
         panel.add(AutoRecordMoveCheck);
 
         JPanel AutoRecordMoveTimePanel = new JPanel();
@@ -296,6 +339,11 @@ public class Recorder {
             public void keyReleased(KeyEvent e) {
                 String text = deletChar(AutoRecordMoveTimeField.getText());
                 AutoRecordMoveTime = Integer.parseInt(text);
+                try {
+                    Main.configMgr.save();
+                } catch (IOException ex) {
+                    throw new RuntimeException(ex);
+                }
             }
         });
         AutoRecordMoveTimePanel.add(AutoRecordMoveTimeField, BorderLayout.CENTER);
@@ -311,6 +359,30 @@ public class Recorder {
 
     public boolean isRecording() {
         return isRecording.get();
+    }
+
+    public String getSaveString() {
+        String recordMouseLocationStr = recordMouseLocation ? "true" : "false";
+        String recordMouseClicksStr = recordMouseClicks ? "true" : "false";
+        String recordKeyboardInputStr = recordKeyboardInput ? "true" : "false";
+        String recordSleepStr = recordSleep.get() ? "true" : "false";
+        String minSleepTimeStr = String.valueOf(minSleepTime);
+        String messageTooltipStr = messageTooltip ? "true" : "false";
+        String AutoRecordMoveStr = AutoRecordMove.get() ? "true" : "false";
+        String AutoRecordMoveTimeStr = String.valueOf(AutoRecordMoveTime);
+        return recordMouseLocationStr + "," + recordMouseClicksStr + "," + recordKeyboardInputStr + "," + recordSleepStr + "," + minSleepTimeStr + "," + messageTooltipStr + "," + AutoRecordMoveStr + "," + AutoRecordMoveTimeStr;
+    }
+
+    public void setSaveString(String saveString) {
+        String[] saveArray = saveString.split(",");
+        recordMouseLocation = Boolean.parseBoolean(saveArray[0]);
+        recordMouseClicks = Boolean.parseBoolean(saveArray[1]);
+        recordKeyboardInput = Boolean.parseBoolean(saveArray[2]);
+        recordSleep.set(Boolean.parseBoolean(saveArray[3]));
+        minSleepTime = Integer.parseInt(saveArray[4]);
+        messageTooltip = Boolean.parseBoolean(saveArray[5]);
+        AutoRecordMove.set(Boolean.parseBoolean(saveArray[6]));
+        AutoRecordMoveTime = Integer.parseInt(saveArray[7]);
     }
 
     private String deletChar(String str) {

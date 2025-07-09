@@ -6,11 +6,7 @@ import com.github.kwhat.jnativehook.keyboard.NativeKeyListener;
 import com.godpalace.waiter.Main;
 import com.godpalace.waiter.config.Config;
 import com.godpalace.waiter.config.ConfigMgr;
-import com.godpalace.waiter.gui.ConfigPanel;
-import com.godpalace.waiter.gui.UIFrame;
 import lombok.Getter;
-
-import javax.annotation.processing.Generated;
 
 public class Binder {
 
@@ -42,7 +38,6 @@ public class Binder {
                     System.out.println(" ");
                     System.out.println("[*]<Record> Stop.");
                     Main.recorder.stopRecord();
-                    Main.frame.toFront();
                     Main.recorder.saveRecords();
                 } else {
                     System.out.println(" ");

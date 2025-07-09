@@ -48,6 +48,7 @@ public class ConfigMgr {
         FileOutputStream fos = new FileOutputStream(file);
         fos.write(("Enable " + enableKey + "\n").getBytes());
         fos.write(("Record " + recordkey + "\n").getBytes());
+        fos.write(("RecordSetting " + Main.recorder.getSaveString() + "\n").getBytes());
         for (Config config : configMap.values()) {
             String text = "Config " + config.name + " "
                     + config.path + " "
@@ -78,6 +79,12 @@ public class ConfigMgr {
 
             if (line.startsWith("Record ")) {
                 recordkey = line.split(" ")[1];
+                continue;
+            }
+
+            if (line.startsWith("RecordSetting ")) {
+                String setting = line.split(" ")[1];
+                Main.recorder.setSaveString(setting);
                 continue;
             }
 

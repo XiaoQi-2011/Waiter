@@ -3,7 +3,6 @@ package com.godpalace.waiter.gui;
 import com.godpalace.waiter.Main;
 import com.godpalace.waiter.config.Config;
 import com.godpalace.waiter.config.ConfigMgr;
-import lombok.Getter;
 
 import javax.swing.*;
 import java.awt.*;
