@@ -71,9 +71,9 @@ public class Compiler {
                         if (value == 1) {
                             robot.mousePress(InputEvent.BUTTON1_DOWN_MASK);
                         } else if (value == 2) {
-                            robot.mousePress(InputEvent.BUTTON2_DOWN_MASK);
-                        } else if (value == 3) {
                             robot.mousePress(InputEvent.BUTTON3_DOWN_MASK);
+                        } else if (value == 3) {
+                            robot.mousePress(InputEvent.BUTTON2_DOWN_MASK);
                         }
                     }
 
@@ -82,9 +82,9 @@ public class Compiler {
                         if (value == 1) {
                             robot.mouseRelease(InputEvent.BUTTON1_DOWN_MASK);
                         } else if (value == 2) {
-                            robot.mouseRelease(InputEvent.BUTTON2_DOWN_MASK);
-                        } else if (value == 3) {
                             robot.mouseRelease(InputEvent.BUTTON3_DOWN_MASK);
+                        } else if (value == 3) {
+                            robot.mouseRelease(InputEvent.BUTTON2_DOWN_MASK);
                         }
                     }
 

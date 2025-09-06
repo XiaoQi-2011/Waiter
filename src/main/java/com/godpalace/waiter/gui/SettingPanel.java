@@ -15,7 +15,7 @@ public class SettingPanel extends JPanel {
     public int height = 140;
     public JLabel titleLabel = new JLabel("设置 []");
     public JSpinner delayTextField = new JSpinner(new SpinnerNumberModel(5, 1, 1000, 1));
-    public JTextField keyBindTextField = new JTextField("None");
+    public KeyBindField keyBindTextField = new KeyBindField();
     public JCheckBox isWhileChecked = new JCheckBox("", true);
     public JTextArea fileLabel = new JTextArea("");
     public JButton fileButton;
@@ -166,16 +166,12 @@ public class SettingPanel extends JPanel {
             }
         });
 
-        keyBindTextField.addKeyListener(new KeyAdapter() {
-            @Override
-            public void keyReleased(KeyEvent e) {
-                String key = KeyEvent.getKeyText(e.getKeyCode());
-                keyBindTextField.setText(key.equals("Esc") ? "None" : key);
-                try {
-                    saveConfig();
-                } catch (IOException ex) {
-                    throw new RuntimeException(ex);
-                }
+        keyBindTextField.setStopExecutor(() -> {
+            try {
+                Main.binder.start();
+                saveConfig();
+            } catch (Exception ex) {
+                throw new RuntimeException(ex);
             }
         });
 

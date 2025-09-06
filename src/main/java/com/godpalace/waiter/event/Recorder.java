@@ -111,11 +111,6 @@ public class Recorder {
         }
 
         @Override
-        public void nativeMouseClicked(NativeMouseEvent nativeEvent) {
-            MouseEvent("ClickMouse", nativeEvent);
-        }
-
-        @Override
         public void nativeMouseReleased(NativeMouseEvent nativeEvent) {
             MouseEvent("ReleaseMouse", nativeEvent);
         }
